@@ -1,0 +1,10 @@
+---
+- name: Configure Flask server
+  hosts: flask
+  become: yes
+
+  tasks:
+    - name: Run Flask setup script
+      script: scripts/setup_flask.sh
+      environment:
+        IP_ADDR: "{{ hostvars[groups['mysql'][0]].private_ip_address }}"
