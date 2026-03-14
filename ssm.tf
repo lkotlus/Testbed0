@@ -33,9 +33,9 @@ resource "aws_ssm_association" "run_ansible" {
 
   depends_on = [
     aws_instance.controller_instance,
-    aws_instance.attack_box,
     aws_instance.external_site,
-    aws_instance.internal_database,
+    aws_instance.internal_1,
+    aws_instance.internal_2,
     aws_s3_bucket.ansible_playbooks,
     aws_s3_object.ansible_playbooks
   ]

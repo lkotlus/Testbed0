@@ -1,7 +1,10 @@
 # Primary ENI (external subnet)
 resource "aws_network_interface" "controller_instance_primary_eni" {
   subnet_id       = aws_subnet.external_subnet.id
-  security_groups = [aws_security_group.external_subnet_sg.id]
+  security_groups = [
+    aws_security_group.external_subnet_sg.id,
+    aws_security_group.public_sg.id
+  ]
   tags = {
     Name = "controller-primary-eni"
   }
@@ -49,20 +52,24 @@ resource "aws_instance" "controller_instance" {
 
   user_data = <<-EOF
     #!/bin/bash
+
     # SSM Agent
     snap switch --channel=candidate amazon-ssm-agent
     snap install amazon-ssm-agent --classic
     systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
     systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service
+
     # Ansible
     apt-get update -y
     apt-get install -y python3-pip
     pip3 install --system ansible awscli boto3 botocore
     ansible-galaxy collection install amazon.aws
+
     # Get the private key for all managed instances
     echo "${tls_private_key.managed_nodes.private_key_pem}" > /home/ubuntu/.ssh/managed_nodes.pem
     chmod 600 /home/ubuntu/.ssh/managed_nodes.pem
     chown ubuntu:ubuntu /home/ubuntu/.ssh/managed_nodes.pem
+
     # Show complete user_data
     touch /home/ubuntu/complete
   EOF

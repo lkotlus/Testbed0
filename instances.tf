@@ -7,7 +7,7 @@ resource "aws_network_interface" "external_site_primary_eni" {
   }
 }
 
-# Secondary ENI for mysql access
+# Secondary ENI for internal access
 resource "aws_network_interface" "external_site_eni" {
   subnet_id       = aws_subnet.internal_subnet.id
   security_groups = [aws_security_group.internal_subnet_sg.id]
@@ -26,7 +26,7 @@ resource "aws_eip_association" "external_site_eip_assoc" {
   allocation_id        = aws_eip.external_site_eip.id
 }
 
-# External flask site
+# External site
 resource "aws_instance" "external_site" {
   ami                  = data.aws_ami.ubuntu.id
   instance_type        = "t2.small"
@@ -65,8 +65,8 @@ resource "aws_instance" "external_site" {
   EOF
 }
 
-# Internal Database
-resource "aws_instance" "internal_database" {
+# Internal machine  1
+resource "aws_instance" "internal_1" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
   subnet_id                   = aws_subnet.internal_subnet.id
@@ -75,7 +75,7 @@ resource "aws_instance" "internal_database" {
   key_name                    = aws_key_pair.managed_nodes.key_name
 
   tags = {
-    Name     = "internal-mysql"
+    Name     = "internal-1"
     Services = "mysql"
     Type     = "managed"
   }
@@ -99,18 +99,19 @@ resource "aws_instance" "internal_database" {
   EOF
 }
 
-# Attack box
-resource "aws_instance" "attack_box" {
-  ami                         = data.aws_ami.kali_linux.id
+# Internal machine  2
+resource "aws_instance" "internal_2" {
+  ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
-  subnet_id                   = aws_subnet.external_subnet.id
-  vpc_security_group_ids      = [aws_security_group.external_subnet_sg.id]
+  subnet_id                   = aws_subnet.internal_subnet.id
+  vpc_security_group_ids      = [aws_security_group.internal_subnet_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.managed_instance_profile.name
   key_name                    = aws_key_pair.managed_nodes.key_name
 
   tags = {
-    Name = "attack-box"
-    Type = "managed"
+    Name     = "internal-2"
+    Services = "mysql"
+    Type     = "managed"
   }
 
   user_data = <<-EOF
@@ -122,14 +123,12 @@ resource "aws_instance" "attack_box" {
     systemctl start ssh
     systemctl enable ssh
 
-    # Manual installation of SSM agent (Kali doesn't have Snap by default)
-    mkdir /tmp/ssm
-    cd /tmp/ssm
-    wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
-    dpkg -i amazon-ssm-agent.deb
+    # SSM Agent Snap installation
+    snap switch --channel=candidate amazon-ssm-agent
+    snap install amazon-ssm-agent --classic
 
-    # Starting/enabling
-    systemctl start amazon-ssm-agent
-    systemctl enable amazon-ssm-agent
+    # Starting/enabling it
+    systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
+    systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service
   EOF
 }
