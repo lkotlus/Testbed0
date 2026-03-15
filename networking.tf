@@ -1,7 +1,3 @@
-###
-### Networking
-###
-
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
@@ -41,7 +37,15 @@ resource "aws_subnet" "internal_subnet" {
   }
 }
 
-resource "aws_route_table" "public_rt" {
+resource "aws_route_table" "internal_rt" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "internal-rt"
+  }
+}
+
+resource "aws_route_table" "external_rt" {
   vpc_id = aws_vpc.main.id
 
   route {
@@ -50,19 +54,32 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "public-rt"
+    Name = "external-rt"
   }
 }
 
 resource "aws_route_table_association" "external_subnet_assoc" {
   subnet_id      = aws_subnet.external_subnet.id
-  route_table_id = aws_route_table.public_rt.id
+  route_table_id = aws_route_table.external_rt.id
 }
 
 resource "aws_route_table_association" "internal_subnet_assoc" {
   subnet_id      = aws_subnet.internal_subnet.id
-  route_table_id = aws_route_table.public_rt.id
+  route_table_id = aws_route_table.internal_rt.id
 }
+
+resource "aws_route" "wireguard" {
+  route_table_id         = aws_route_table.external_rt.id
+  destination_cidr_block = "10.8.0.0/24"
+  network_interface_id   = aws_network_interface.controller_instance_eni.id
+}
+
+resource "aws_route" "internal_to_vpn" {
+  route_table_id         = aws_route_table.internal_rt.id
+  destination_cidr_block = "10.8.0.0/24"
+  network_interface_id   = aws_network_interface.controller_instance_eni.id
+}
+
 
 # Security Group (subnet 1)
 resource "aws_security_group" "external_subnet_sg" {
@@ -94,7 +111,6 @@ resource "aws_security_group" "internal_subnet_sg" {
   name   = "internal_subnet-sg"
   vpc_id = aws_vpc.main.id
 
-  # Allow ingress from within the SG
   ingress {
     from_port   = 0
     to_port     = 0
@@ -107,10 +123,6 @@ resource "aws_security_group" "internal_subnet_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "internal-sg"
   }
 }
 
