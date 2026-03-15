@@ -1,11 +1,11 @@
 plugin: amazon.aws.aws_ec2
 regions:
-  - us-east-1 
+  - us-east-1
 filters:
   tag:Type: managed
   instance-state-name: running
 keyed_groups:
-  - key: tags.Features
+  - key: tags.get('Features', '') | split(',') | map('trim') | reject('equalto', '') | list
     prefix: ""
     separator: ""
 compose:

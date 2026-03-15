@@ -1,8 +1,15 @@
 ---
 - name: Configure Flask server
-  hosts: flask
+  hosts: flask_custom_serial
   become: yes
 
   tasks:
+    - name: Upload source code
+      ansible.builtin.copy:
+        src: files/flask_custom_serial/app.py
+        dest: /home/ubuntu/app.py
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
     - name: Run Flask setup script
       script: scripts/setup_flask_custom_serial.sh
