@@ -45,7 +45,7 @@ resource "aws_instance" "external_site" {
 
   tags = {
     Name     = "external-site"
-    Services = "flask"
+    Features = "flask_custom_serial, mysql"
     Type     = "managed"
   }
 
@@ -76,7 +76,7 @@ resource "aws_instance" "internal_1" {
 
   tags = {
     Name     = "internal-1"
-    Services = "mysql"
+    Features = ""
     Type     = "managed"
   }
 
@@ -110,7 +110,7 @@ resource "aws_instance" "internal_2" {
 
   tags = {
     Name     = "internal-2"
-    Services = "mysql"
+    Features = ""
     Type     = "managed"
   }
 

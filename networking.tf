@@ -30,7 +30,7 @@ resource "aws_subnet" "internal_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "${var.aws_region}a"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name = "internal-subnet"
@@ -74,12 +74,11 @@ resource "aws_route" "wireguard" {
   network_interface_id   = aws_network_interface.controller_instance_eni.id
 }
 
-resource "aws_route" "internal_to_vpn" {
+resource "aws_route" "internal_default" {
   route_table_id         = aws_route_table.internal_rt.id
-  destination_cidr_block = "10.8.0.0/24"
+  destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = aws_network_interface.controller_instance_eni.id
 }
-
 
 # Security Group (subnet 1)
 resource "aws_security_group" "external_subnet_sg" {

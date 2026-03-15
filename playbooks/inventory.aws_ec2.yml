@@ -5,7 +5,7 @@ filters:
   tag:Type: managed
   instance-state-name: running
 keyed_groups:
-  - key: tags.Services
+  - key: tags.Features
     prefix: ""
     separator: ""
 compose:

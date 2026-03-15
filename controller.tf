@@ -92,6 +92,14 @@ resource "aws_instance" "controller_instance" {
     PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
     PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
 
+    PostUp   = iptables -A FORWARD -i wg0 -d 10.0.2.0/24 -j DROP
+    PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT
+    PostUp   = iptables -t nat -A POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
+
+    PostDown = iptables -D FORWARD -i wg0 -d 10.0.2.0/24 -j DROP
+    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+    PostDown = iptables -t nat -D POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
+
     [Peer]
     PublicKey = ${data.external.wireguard_keys.result.client_public}
     AllowedIPs = 10.8.0.2/32

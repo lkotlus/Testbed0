@@ -1,0 +1,8 @@
+---
+- name: Configure Flask server
+  hosts: flask
+  become: yes
+
+  tasks:
+    - name: Run Flask setup script
+      script: scripts/setup_flask_custom_serial.sh
