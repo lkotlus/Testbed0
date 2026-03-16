@@ -54,6 +54,11 @@ resource "aws_instance" "vpn_instance" {
   EOF
 }
 
+resource "aws_eip" "vpn_eip" {
+  domain   = "vpc"
+  instance = aws_instance.vpn_instance.id
+}
+
 data "external" "wireguard_keys" {
   program = ["bash", "-c", <<-EOT
     SERVER_PRIVATE=$(wg genkey)
