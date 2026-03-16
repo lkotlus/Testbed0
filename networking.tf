@@ -19,7 +19,7 @@ resource "aws_subnet" "external_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "${var.aws_region}a"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name = "external-subnet"
@@ -68,10 +68,10 @@ resource "aws_route_table_association" "internal_subnet_assoc" {
   route_table_id = aws_route_table.internal_rt.id
 }
 
-resource "aws_route" "wireguard" {
+resource "aws_route" "vpn_clients" {
   route_table_id         = aws_route_table.external_rt.id
   destination_cidr_block = "10.8.0.0/24"
-  network_interface_id   = aws_network_interface.controller_instance_eni.id
+  network_interface_id   = aws_instance.vpn_instance.primary_network_interface_id
 }
 
 resource "aws_route" "internal_default" {

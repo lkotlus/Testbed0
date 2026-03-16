@@ -16,16 +16,6 @@ resource "aws_network_interface" "external_site_eni" {
   }
 }
 
-# EIP
-resource "aws_eip" "external_site_eip" {
-  domain = "vpc"
-}
-
-resource "aws_eip_association" "external_site_eip_assoc" {
-  network_interface_id = aws_network_interface.external_site_primary_eni.id
-  allocation_id        = aws_eip.external_site_eip.id
-}
-
 # External site
 resource "aws_instance" "external_site" {
   ami                  = data.aws_ami.ubuntu.id

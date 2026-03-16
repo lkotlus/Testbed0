@@ -40,8 +40,8 @@ output "wireguard_client_config" {
 
     [Peer]
     PublicKey = ${data.external.wireguard_keys.result.server_public}
-    Endpoint = ${aws_eip.controller_eip.public_ip}:51820
-    AllowedIPs = ${aws_subnet.internal_subnet.cidr_block}, ${aws_subnet.external_subnet.cidr_block}
+    Endpoint = ${aws_instance.vpn_instance.public_ip}:51820
+    AllowedIPs = ${aws_subnet.external_subnet.cidr_block}
     PersistentKeepalive = 25
   EOT
 }
