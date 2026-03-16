@@ -15,7 +15,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu
-ExecStart=python3 -m flask run --host=0.0.0.0
+ExecStart=python3 -m flask run --host=0.0.0.0 --port=8080
 Restart=always
 
 [Install]
