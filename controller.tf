@@ -42,6 +42,11 @@ resource "aws_instance" "controller_instance" {
     #!/bin/bash
     set -e
 
+    until ping -c1 8.8.8.8 >/dev/null 2>&1; do
+        echo "Waiting for network..."
+        sleep 5
+    done
+
     #
     # SSM Agent
     #
@@ -54,7 +59,7 @@ resource "aws_instance" "controller_instance" {
     # Ansible
     #
     apt-get update -y
-    apt-get install -y python3-pip wireguard
+    apt-get install -y python3-pip
     pip3 install --system ansible awscli boto3 botocore
     ansible-galaxy collection install amazon.aws
 

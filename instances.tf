@@ -41,6 +41,12 @@ resource "aws_instance" "external_site" {
 
   user_data = <<-EOF
     #!/bin/bash
+
+    until ping -c1 8.8.8.8 >/dev/null 2>&1; do
+        echo "Waiting for network..."
+        sleep 5
+    done
+
     # Installing and starting ssh
     apt-get update
     apt-get install -y openssh-server
@@ -72,6 +78,11 @@ resource "aws_instance" "internal_1" {
 
   user_data = <<-EOF
     #!/bin/bash
+
+    until ping -c1 8.8.8.8 >/dev/null 2>&1; do
+        echo "Waiting for network..."
+        sleep 5
+    done
 
     # Installing and starting ssh
     apt-get update
@@ -106,6 +117,11 @@ resource "aws_instance" "internal_2" {
 
   user_data = <<-EOF
     #!/bin/bash
+
+    until ping -c1 8.8.8.8 >/dev/null 2>&1; do
+        echo "Waiting for network..."
+        sleep 5
+    done
 
     # Installing and starting ssh
     apt-get update

@@ -13,24 +13,3 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 }
-
-# AMI lookup for the latest Kali
-data "aws_ami" "kali_linux" {
-  most_recent = true
-  owners      = ["679593333241"] # Offensive Security
-
-  filter {
-    name   = "name"
-    values = ["kali-last-snapshot-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}

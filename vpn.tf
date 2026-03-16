@@ -1,21 +1,21 @@
-# VPN Instance
 resource "aws_instance" "vpn_instance" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.external_subnet.id
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [
-                                  aws_security_group.external_subnet_sg.id,
-                                  aws_security_group.public_sg.id
-                                ]
+  subnet_id                   = aws_subnet.vpn_subnet.id
+  vpc_security_group_ids      = [aws_security_group.vpn_sg.id]
   source_dest_check           = false
 
   tags = {
-    Name     = "vpn-instance"
+    Name = "vpn-instance"
   }
 
   user_data = <<-EOF
     #!/bin/bash
+
+    until ping -c1 8.8.8.8 >/dev/null 2>&1; do
+        echo "Waiting for network..."
+        sleep 5
+    done
 
     # Installing and starting ssh
     apt-get update
@@ -40,8 +40,8 @@ resource "aws_instance" "vpn_instance" {
     Address = 10.8.0.1/24
     ListenPort = 51820
     PrivateKey = ${data.external.wireguard_keys.result.server_private}
-    PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
-    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $PRIMARY_IFACE -j MASQUERADE
+    PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT
+    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT
 
     [Peer]
     PublicKey = ${data.external.wireguard_keys.result.client_public}
@@ -52,11 +52,6 @@ resource "aws_instance" "vpn_instance" {
     systemctl enable wg-quick@wg0
     systemctl start wg-quick@wg0
   EOF
-}
-
-resource "aws_eip" "vpn_eip" {
-  domain   = "vpc"
-  instance = aws_instance.vpn_instance.id
 }
 
 data "external" "wireguard_keys" {
