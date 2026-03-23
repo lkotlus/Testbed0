@@ -1,0 +1,16 @@
+---
+- name: Configure Flask server
+  hosts: backrest_1_12_1
+  become: yes
+
+  tasks:
+    - name: Upload config file
+      ansible.builtin.copy:
+        src: files/backrest_1_12_1/config.json
+        dest: /root/config.json
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Run backrest setup script
+      become: yes
+      script: scripts/setup_backrest_1_12_1.sh

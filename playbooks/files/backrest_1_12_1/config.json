@@ -1,0 +1,20 @@
+{
+  "modno": 1,
+  "version": 4,
+  "instance": "entrypoint-backrest-server",
+  "auth": {
+    "users": [
+      {
+        "name": "entrypoint-admin",
+        "passwordBcrypt": "JDJhJDEwJGlBTDFOeVBOeFJPbWlBei9uTEtHZy5HR2lzdFQyUlpQZW14bHlIRXNUckxpa3JVZ05xSnJT"
+      }
+    ]
+  },
+  "sync": {
+    "identity": {
+      "keyId": "ecdsa.evm6Hwxc9y4iQ-4Zup4bcg-j1iMUV_bUGlhaJ3N8N8o",
+      "ed25519priv": "-----BEGIN EC PRIVATE-----\nMHcCAQEEIKYC/t8MbF1gMl+fEKAZgLQsAxbEVVzZUim7ALjPQyweoAoGCCqGSM49\nAwEHoUQDQgAE0DmK5H9rKcdlbnRWvO4+KJzjvr2HNs/KbRjDpIBi1S6Y7qoEaiiT\naXxUhqzbfzvjN7u04uDO8ZoKDPs8ZmeAtw==\n-----END EC PRIVATE-----\n",
+      "ed25519pub": "-----BEGIN EC PUBLIC-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0DmK5H9rKcdlbnRWvO4+KJzjvr2H\nNs/KbRjDpIBi1S6Y7qoEaiiTaXxUhqzbfzvjN7u04uDO8ZoKDPs8ZmeAtw==\n-----END EC PUBLIC-----\n"
+    }
+  }
+}

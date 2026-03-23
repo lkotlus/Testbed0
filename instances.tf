@@ -35,7 +35,7 @@ resource "aws_instance" "external_site" {
 
   tags = {
     Name     = "external-site"
-    Features = "flask_custom_serial, mysql, grafana_11_0_0, subdomains"
+    Features = "flask_custom_serial, mysql, grafana_11_0_0, subdomains, backrest_1_12_1"
     Type     = "managed"
   }
 
