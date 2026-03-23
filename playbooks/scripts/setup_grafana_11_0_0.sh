@@ -62,6 +62,24 @@ sudo tee /etc/systemd/system/grafana-server.service.d/override.conf > /dev/null 
 Environment="HOME=/tmp"
 EOF
 
+GRAFANA_URL="http://localhost:3000"
+ADMIN_USER="admin"
+ADMIN_PASS="admin"
+
+NEW_USER="entrypoint-admin"
+NEW_PASS="P@\$\$w0rd123!"
+NEW_EMAIL="entrypoint-admin@entrypoint.dta"
+
+curl -s -X POST "$GRAFANA_URL/api/admin/users" \
+  -u "$ADMIN_USER:$ADMIN_PASS" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"name\": \"$NEW_USER\",
+    \"email\": \"$NEW_EMAIL\",
+    \"login\": \"$NEW_USER\",
+    \"password\": \"$NEW_PASS\"
+  }"
+
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl restart grafana-server
