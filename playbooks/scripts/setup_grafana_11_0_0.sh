@@ -1,10 +1,15 @@
 sudo apt update
-sudo apt install -y ./grafana.deb unzip
+sudo apt install -y wget unzip
+
+wget https://github.com/lkotlus/Testbed0/releases/download/Dependencies/duckdb_cli-linux-amd64.zip
+wget https://github.com/lkotlus/Testbed0/releases/download/Dependencies/grafana_11.0.0_amd64.deb
+wget https://github.com/lkotlus/Testbed0/releases/download/Dependencies/motherduck-duckdb-datasource-0.4.1.zip
+
+sudo apt install -y ./grafana_11.0.0_amd64.deb
+rm ./grafana_11.0.0_amd64.deb
 
 sudo systemctl start grafana-server
 sudo systemctl enable grafana-server
-
-rm grafana.deb
 
 sudo grafana-cli admin reset-admin-password admin
 
@@ -16,6 +21,8 @@ sudo mv duckdb /usr/local/bin/
 PLUGIN_NAME="motherduck-duckdb-datasource"
 PLUGIN_DIR="/var/lib/grafana/plugins"
 PROVISIONING_DIR="/etc/grafana/provisioning/datasources"
+
+mv motherduck-duckdb-datasource-0.4.1.zip /tmp/${PLUGIN_NAME}.zip
 
 sudo mkdir -p $PLUGIN_DIR
 

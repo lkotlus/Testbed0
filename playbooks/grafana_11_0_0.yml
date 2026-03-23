@@ -4,26 +4,5 @@
   become: yes
 
   tasks:
-    - name: Upload Grafana package
-      ansible.builtin.copy:
-        src: files/grafana_11_0_0/grafana_11.0.0_amd64.deb
-        dest: /home/ubuntu/grafana.deb
-        owner: ubuntu
-        group: ubuntu
-        mode: '0644'
-    - name: Upload duckdb binary zip
-      ansible.builtin.copy:
-        src: files/grafana_11_0_0/duckdb_cli-linux-amd64.zip
-        dest: /home/ubuntu/duckdb_cli-linux-amd64.zip
-        owner: ubuntu
-        group: ubuntu
-        mode: '0644'
-    - name: Upload duckdb plugin zip
-      ansible.builtin.copy:
-        src: files/grafana_11_0_0/motherduck-duckdb-datasource-0.4.1.zip
-        dest: /tmp/motherduck-duckdb-datasource.zip
-        owner: ubuntu
-        group: ubuntu
-        mode: '0644'
     - name: Run setup script
       script: scripts/setup_grafana_11_0_0.sh
