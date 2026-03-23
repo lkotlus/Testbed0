@@ -1,3 +1,4 @@
 ---
 - import_playbook: mysql.yml
 - import_playbook: flask_custom_serial.yml
+- import_playbook: subdomains.yml

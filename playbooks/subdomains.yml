@@ -1,0 +1,15 @@
+---
+- name: Configure TB0 subdomains
+  hosts: subdomains
+  become: yes
+
+  tasks:
+    - name: Upload nginx config
+      ansible.builtin.copy:
+        src: files/subdomains/subdomains.conf
+        dest: /home/ubuntu/subdomains.conf
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Run setup script
+      script: scripts/setup_subdomains.sh
