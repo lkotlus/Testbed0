@@ -1,5 +1,7 @@
 ---
-- import_playbook: mysql.yml
+- import_playbook: harden_ubuntu.yml
+- import_playbook: mysql_passwd_leak.yml
+- import_playbook: mysql_leaked_passwds.yml
 - import_playbook: flask_custom_serial.yml
 - import_playbook: grafana_11_0_0.yml
 - import_playbook: subdomains.yml

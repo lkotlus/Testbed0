@@ -1,0 +1,8 @@
+---
+- name: Set a machine to use the passwords leaked by MySQL
+  hosts: mysql_leaked_passwds
+  become: yes
+
+  tasks:
+    - name: Run setup script
+      script: scripts/setup_mysql_leaked_passwds.sh

@@ -35,7 +35,7 @@ resource "aws_instance" "external_site" {
 
   tags = {
     Name     = "external-site"
-    Features = "flask_custom_serial, mysql, grafana_11_0_0, subdomains, backrest_1_12_1"
+    Features = "harden_ubuntu, flask_custom_serial, mysql_passwd_leak, grafana_11_0_0, subdomains, backrest_1_12_1"
     Type     = "managed"
   }
 
@@ -72,7 +72,7 @@ resource "aws_instance" "internal_1" {
 
   tags = {
     Name     = "internal-1"
-    Features = ""
+    Features = "harden_ubuntu, mysql_leaked_passwds"
     Type     = "managed"
   }
 
@@ -111,7 +111,7 @@ resource "aws_instance" "internal_2" {
 
   tags = {
     Name     = "internal-2"
-    Features = ""
+    Features = "harden_ubuntu"
     Type     = "managed"
   }
 

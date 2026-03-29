@@ -1,0 +1,8 @@
+---
+- name: Basic Ubuntu hardening
+  hosts: harden_ubuntu
+  become: yes
+
+  tasks:
+    - name: Run setup script
+      script: scripts/setup_harden_ubuntu.sh

@@ -1,6 +1,6 @@
 ---
 - name: Configure MySQL server
-  hosts: mysql
+  hosts: mysql_passwd_leak
   become: yes
 
   tasks:
