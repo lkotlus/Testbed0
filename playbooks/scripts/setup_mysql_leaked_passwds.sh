@@ -1,3 +1,5 @@
+#!/bin/bash
+
 USERNAME=mgebril
 PASSWORD=sopmac6yelhsa
 

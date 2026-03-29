@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # 
 # Make SSH relatively secure
 #
