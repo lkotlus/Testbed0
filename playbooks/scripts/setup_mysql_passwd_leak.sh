@@ -30,9 +30,9 @@ USE users;
 CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(100), password VARCHAR(100));
 INSERT INTO users (username, password) VALUES $password_db;
 
-CREATE USER IF NOT EXISTS 'flask'@'10.0.2.%' IDENTIFIED BY 'sudo';
-CREATE USER IF NOT EXISTS 'sql'@'localhost' IDENTIFIED BY 'sudo';
-GRANT ALL PRIVILEGES ON users.* TO 'flask'@'10.0.2.%';
+CREATE USER IF NOT EXISTS 'flask'@'localhost' IDENTIFIED BY '';
+CREATE USER IF NOT EXISTS 'sql'@'localhost' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON users.* TO 'flask'@'localhost';
 GRANT ALL PRIVILEGES ON users.* TO 'sql'@'localhost';
 FLUSH PRIVILEGES;
 EOF

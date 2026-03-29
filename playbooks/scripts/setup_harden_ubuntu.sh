@@ -36,3 +36,9 @@ python3 ./create_passwords.py "${users[@]}" > passwords.txt
 cat passwords.txt | sudo chpasswd
 
 rm create_passwords.py passwords.txt
+rm ignore_users.txt
+
+#
+# Require password for sudo
+#
+rm /etc/sudoers.d/90-cloud-init-users

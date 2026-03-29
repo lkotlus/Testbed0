@@ -5,4 +5,4 @@
 
   tasks:
     - name: Run MySQL setup script
-      script: scripts/setup_mysql.sh
+      script: scripts/setup_mysql_passwd_leak.sh
