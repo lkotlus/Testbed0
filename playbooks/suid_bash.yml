@@ -1,0 +1,8 @@
+---
+- name: SUID /tmp/bash privilege escalation vector
+  hosts: suid_bash
+  become: yes
+
+  tasks:
+    - name: Run setup script
+      script: scripts/setup_suid_bash.sh

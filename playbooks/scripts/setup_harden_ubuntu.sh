@@ -9,8 +9,6 @@ sudo sed -i 's/^#PermitRootLogin/PermitRootLogin/' $SSHDPATH
 sudo sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' $SSHDPATH
 
 sudo systemctl restart ssh
-
-
 # 
 # Actually create user passwords
 #
@@ -37,8 +35,3 @@ cat passwords.txt | sudo chpasswd
 
 rm create_passwords.py passwords.txt
 rm ignore_users.txt
-
-#
-# Require password for sudo
-#
-rm /etc/sudoers.d/90-cloud-init-users

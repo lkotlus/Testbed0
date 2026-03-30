@@ -12,5 +12,4 @@
         group: root
         mode: '0644'
     - name: Run backrest setup script
-      become: yes
       script: scripts/setup_backrest_1_12_1.sh

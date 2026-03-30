@@ -72,7 +72,7 @@ resource "aws_instance" "internal_1" {
 
   tags = {
     Name     = "internal-1"
-    Features = "harden_ubuntu, mysql_leaked_passwds"
+    Features = "harden_ubuntu, mysql_leaked_passwds, suid_bash"
     Type     = "managed"
   }
 

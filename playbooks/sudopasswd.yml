@@ -1,0 +1,8 @@
+---
+- name: Disable sudo without password
+  hosts: harden_ubuntu
+  become: yes
+
+  tasks:
+    - name: Run setup script
+      script: scripts/setup_sudopasswd.sh
