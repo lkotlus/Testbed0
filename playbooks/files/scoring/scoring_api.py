@@ -49,7 +49,7 @@ def report_finding(timestamp: str, correctness: dict, flag: str, category: str, 
     finding = {
         "time": timestamp,
         "correct_elements": correctness,
-        "flag_reported": flag,
+        "flag_reported": f"dta_flag{{{flag}}}",
         "category_reported": category,
         "host": host,
         "port": port,
@@ -85,7 +85,10 @@ def check_finding(req: FindingRequest) -> dict:
 
         correctness["category"] = req.category == entry["category"]
         correctness["host"] = req.host == entry["host"]
-        correctness["port"] = req.port == entry["port"]
+        if "port" in entry:
+            correctness["port"] = req.port == entry["port"]
+        else:
+            correctness["port"] = True
 
         description = entry["backend_description"]
     else:
@@ -98,7 +101,7 @@ def check_finding(req: FindingRequest) -> dict:
     report_finding(
         datetime.now(UTC).isoformat(),
         correctness,
-        req.flag,
+        normalized_flag,
         req.category,
         req.host,
         req.port,

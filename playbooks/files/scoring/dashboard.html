@@ -27,12 +27,6 @@
     --wrong-bg: #fcebeb;
     --blue: #185fa5;
     --blue-bg: #e6f1fb;
-    --chart-1: #378add;
-    --chart-2: #639922;
-    --chart-3: #d85a30;
-    --chart-4: #7f77dd;
-    --chart-5: #1d9e75;
-    --chart-6: #ba7517;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -65,203 +59,6 @@
     min-height: 100vh;
   }
 
-  header {
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--border);
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  header h1 {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  header .subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-  }
-
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--correct);
-    flex-shrink: 0;
-  }
-
-  .status-dot.loading { background: var(--partial); }
-  .status-dot.error { background: var(--wrong); }
-
-  #last-refresh {
-    font-size: 12px;
-    color: var(--text-hint);
-  }
-
-  button#refresh-btn {
-    font-size: 12px;
-    padding: 5px 12px;
-    border: 0.5px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  button#refresh-btn:hover { background: var(--surface-secondary); }
-
-  main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
-
-  .metric-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 1.5rem;
-  }
-
-  .metric-card {
-    background: var(--surface-secondary);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    border: 0.5px solid var(--border);
-  }
-
-  .metric-label {
-    font-size: 11px;
-    color: var(--text-hint);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
-  }
-
-  .metric-value {
-    font-size: 26px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.1;
-  }
-
-  .metric-sub {
-    font-size: 11px;
-    color: var(--text-hint);
-    margin-top: 2px;
-  }
-
-  .chart-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 1.5rem;
-  }
-
-  @media (max-width: 680px) {
-    .chart-grid { grid-template-columns: 1fr; }
-  }
-
-  .card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-  }
-
-  .card-full { grid-column: 1 / -1; }
-
-  .card-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
-    letter-spacing: 0.02em;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    table-layout: fixed;
-  }
-
-  th {
-    text-align: left;
-    font-weight: 500;
-    font-size: 11px;
-    color: var(--text-hint);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 6px 8px 8px;
-    border-bottom: 0.5px solid var(--border-strong);
-  }
-
-  td {
-    padding: 7px 8px;
-    border-bottom: 0.5px solid var(--border);
-    color: var(--text);
-    vertical-align: middle;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  tr:last-child td { border-bottom: none; }
-
-  .col-time   { width: 148px; }
-  .col-flag   { width: 230px; }
-  .col-cat    { width: 110px; }
-  .col-host   { width: 110px; }
-  .col-port   { width: 70px; }
-  .col-result { width: 90px; text-align: center; }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .badge-correct  { background: var(--correct-bg); color: var(--correct); }
-  .badge-partial  { background: var(--partial-bg); color: var(--partial); }
-  .badge-wrong    { background: var(--wrong-bg);   color: var(--wrong);   }
-
-  .dot-row {
-    display: flex;
-    gap: 3px;
-    justify-content: center;
-  }
-
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot.ok  { background: var(--correct); }
-  .dot.bad { background: var(--wrong); }
-  .dot.na  { background: var(--border-strong); }
-
-  #empty-state, #error-state {
-    display: none;
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-hint);
-    font-size: 14px;
-  }
-
   .config-bar {
     background: var(--blue-bg);
     color: var(--blue);
@@ -272,38 +69,111 @@
     gap: 8px;
     border-bottom: 0.5px solid var(--border);
   }
+  .config-bar code { font-family: monospace; font-size: 12px; opacity: 0.85; }
 
-  .config-bar code {
-    font-family: monospace;
-    font-size: 12px;
-    opacity: 0.85;
-  }
-
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-
-  .legend span {
+  header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: space-between;
+    gap: 12px;
   }
+  header h1       { font-size: 16px; font-weight: 500; }
+  header .subtitle { font-size: 12px; color: var(--text-muted); }
 
-  .legend .swatch {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
+  .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--correct); flex-shrink: 0; }
+  .status-dot.loading { background: var(--partial); }
+  .status-dot.error   { background: var(--wrong); }
+
+  #last-refresh { font-size: 12px; color: var(--text-hint); }
+
+  button#refresh-btn {
+    font-size: 12px; padding: 5px 12px;
+    border: 0.5px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: transparent; color: var(--text-muted); cursor: pointer;
+    transition: background 0.15s;
+  }
+  button#refresh-btn:hover { background: var(--surface-secondary); }
+
+  main { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .metric-card  { background: var(--surface-secondary); border-radius: var(--radius-sm); padding: 14px 16px; border: 0.5px solid var(--border); }
+  .metric-label { font-size: 11px; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .metric-value { font-size: 26px; font-weight: 500; line-height: 1.1; }
+  .metric-sub   { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+  @media (max-width: 760px) { .chart-grid { grid-template-columns: 1fr; } }
+
+  .card      { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
+  .card-full { grid-column: 1 / -1; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 0.75rem; letter-spacing: 0.02em; }
+
+  .legend      { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .swatch      { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 860px; }
+  th {
+    text-align: left; font-weight: 500; font-size: 11px; color: var(--text-hint);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 6px 8px 8px; border-bottom: 0.5px solid var(--border-strong); white-space: nowrap;
+  }
+  td { padding: 7px 8px; border-bottom: 0.5px solid var(--border); color: var(--text); vertical-align: middle; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-info   { width: 36px; text-align: center; }
+  .col-time   { width: 148px; }
+  .col-flag   { min-width: 330px; font-family: monospace; font-size: 12px; }
+  .col-cat    { min-width: 120px; }
+  .col-host   { width: 100px; }
+  .col-port   { width: 64px; }
+  .col-result { width: 84px; text-align: center; }
+
+  .info-btn {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--text-hint); color: var(--text-hint);
+    font-size: 11px; font-style: italic; font-weight: 700; line-height: 1;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; padding: 0;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .info-btn:hover  { border-color: var(--blue); color: var(--blue); }
+  .info-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+
+  .detail-row      { display: none; }
+  .detail-row.open { display: table-row; }
+  .detail-row td {
+    background: var(--surface-secondary); color: var(--text-muted);
+    font-size: 12px; padding: 6px 12px 8px 40px; white-space: normal;
+  }
+  .detail-row td strong { color: var(--text-hint); font-weight: 500; }
+
+  .dot-row { display: flex; gap: 3px; justify-content: center; }
+  .dot     { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.ok  { background: var(--correct); }
+  .dot.bad { background: var(--wrong); }
+
+  #empty-state, #error-state {
+    display: none; text-align: center;
+    padding: 3rem 1rem; color: var(--text-hint); font-size: 14px;
   }
 </style>
 </head>
 <body>
 
-<div class="config-bar" id="config-bar">
+<div class="config-bar">
   Fetching from: <code id="bucket-url-display"></code>
 </div>
 
@@ -334,55 +204,70 @@
     <div class="metric-card">
       <div class="metric-label">Fully correct</div>
       <div class="metric-value" id="m-full">—</div>
-      <div class="metric-sub">flag + cat + host + port</div>
+      <div class="metric-sub">all four fields</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Unique flags found</div>
       <div class="metric-value" id="m-unique">—</div>
-      <div class="metric-sub" id="m-unique-sub">—</div>
+      <div class="metric-sub">distinct valid flags</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Category accuracy</div>
       <div class="metric-value" id="m-cat">—</div>
-      <div class="metric-sub">of submissions w/ correct flag</div>
+      <div class="metric-sub">of correct-flag submissions</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Host accuracy</div>
       <div class="metric-value" id="m-host">—</div>
-      <div class="metric-sub">of submissions w/ correct flag</div>
+      <div class="metric-sub">of correct-flag submissions</div>
     </div>
   </div>
 
   <div class="chart-grid">
     <div class="card">
       <div class="card-title">Submissions over time</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#3b6d11"></span>Perfect (all fields correct)</span>
+        <span><span class="swatch" style="background:#854f0b"></span>Partial (correct flag, wrong details)</span>
+        <span><span class="swatch" style="background:#a32d2d"></span>Incorrect (wrong flag)</span>
+      </div>
       <div style="position: relative; width: 100%; height: 220px;">
-        <canvas id="chart-timeline" role="img" aria-label="Line chart of submissions over time">Submission timeline chart.</canvas>
+        <canvas id="chart-timeline" role="img" aria-label="Stacked area chart of cumulative submissions by correctness over time, with per-submission scatter dots">Submission timeline chart.</canvas>
       </div>
     </div>
     <div class="card">
       <div class="card-title">Correctness breakdown</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:rgba(59,109,17,0.85)"></span>Correct</span>
+        <span><span class="swatch" style="background:rgba(133,79,11,0.85)"></span>Wrong detail (flag correct)</span>
+        <span><span class="swatch" style="background:rgba(163,45,45,0.75)"></span>Wrong flag</span>
+      </div>
       <div style="position: relative; width: 100%; height: 220px;">
-        <canvas id="chart-correctness" role="img" aria-label="Bar chart of correctness per field">Correctness breakdown chart.</canvas>
+        <canvas id="chart-correctness" role="img" aria-label="Stacked bar chart of correctness per field">Correctness breakdown chart.</canvas>
       </div>
     </div>
     <div class="card card-full">
       <div class="card-title">Submissions by category</div>
-      <div id="legend-category" class="legend"></div>
-      <div style="position: relative; width: 100%; height: 200px;">
-        <canvas id="chart-categories" role="img" aria-label="Bar chart of submissions per vulnerability category">Category chart.</canvas>
+      <div class="legend">
+        <span><span class="swatch" style="background:rgba(59,109,17,0.85)"></span>Fully correct</span>
+        <span><span class="swatch" style="background:rgba(133,79,11,0.85)"></span>Partial (correct flag)</span>
+        <span><span class="swatch" style="background:rgba(163,45,45,0.75)"></span>Wrong flag</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="chart-categories" role="img" aria-label="Stacked bar chart of submissions by reported category">Category chart.</canvas>
       </div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">All findings</div>
-    <div id="error-state">Could not load findings. Check the bucket URL and CORS configuration.</div>
+    <div id="error-state"></div>
     <div id="empty-state">No findings submitted yet.</div>
-    <div style="overflow-x: auto;">
+    <div class="table-wrap">
       <table id="findings-table">
         <thead>
           <tr>
+            <th class="col-info"></th>
             <th class="col-time">Time (UTC)</th>
             <th class="col-flag">Flag</th>
             <th class="col-cat">Category</th>
@@ -398,30 +283,73 @@
 </main>
 
 <script>
-const BUCKET_URL = "https://assessment-findings.s3.amazonaws.com";
-const FINDINGS_PREFIX = "findings/";
-const REFRESH_INTERVAL_MS = 10000;
-
-const CHART_COLORS = ["#378add","#639922","#d85a30","#7f77dd","#1d9e75","#ba7517","#d4537e","#888780"];
+/* ─── CONFIGURATION ─────────────────────────────────────────────────────── */
+const BUCKET_URL          = "https://assessment-findings.s3.amazonaws.com";
+const FINDINGS_PREFIX     = "findings/";
+const REFRESH_INTERVAL_MS = 30_000;
+/* ────────────────────────────────────────────────────────────────────────── */
 
 document.getElementById("bucket-url-display").textContent = BUCKET_URL + "/" + FINDINGS_PREFIX;
 
+/* ─── STATE ─── */
 let timelineChart = null, correctnessChart = null, categoryChart = null;
+let chartsInitialized = false;
 
-function isDark() {
-  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
+/*
+ * timelineSorted is a mutable module-level ref so the tooltip callback always
+ * reads current data — not the array captured at chart-init time.
+ */
+let timelineSorted = [];
 
+/* ─── HELPERS ─── */
+function isDark()    { return window.matchMedia("(prefers-color-scheme: dark)").matches; }
 function axisColor() { return isDark() ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"; }
 function gridColor() { return isDark() ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"; }
 
+function pct(n, d)  { return d === 0 ? "—" : Math.round((n / d) * 100) + "%"; }
+
+function formatTime(iso) {
+  try { return new Date(iso).toISOString().replace("T", " ").slice(0, 16); }
+  catch { return iso; }
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function findingScore(f) {
+  const c = f.correct_elements;
+  if (!c.flag) return "wrong";
+  if (c.category && c.host && c.port) return "correct";
+  return "partial";
+}
+
+function findingColorHex(f) {
+  switch (findingScore(f)) {
+    case "correct": return "#3b6d11";
+    case "wrong":   return "#a32d2d";
+    default:        return "#854f0b";
+  }
+}
+
+/* Tick label for the x-axis: full date + time so the assessment day is unambiguous */
+function fmtAxisTick(ms) {
+  const d  = new Date(ms);
+  const mo = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dy = String(d.getUTCDate()).padStart(2, "0");
+  const hr = String(d.getUTCHours()).padStart(2, "0");
+  const mn = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${mo}-${dy} ${hr}:${mn}`;
+}
+
+/* ─── S3 FETCH ─── */
 async function listFindings() {
   const url = `${BUCKET_URL}?list-type=2&prefix=${FINDINGS_PREFIX}&max-keys=1000`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`S3 list failed: ${res.status}`);
-  const text = await res.text();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, "application/xml");
+  const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
   return Array.from(xml.querySelectorAll("Contents Key"))
     .map(k => k.textContent)
     .filter(k => k.endsWith(".json") && k !== FINDINGS_PREFIX);
@@ -433,36 +361,30 @@ async function fetchFinding(key) {
   return res.json();
 }
 
-function pct(n, d) {
-  if (d === 0) return "—";
-  return Math.round((n / d) * 100) + "%";
+/* ─── METRICS ─── */
+function renderMetrics(findings) {
+  const total        = findings.length;
+  const correctFlags = findings.filter(f => f.correct_elements.flag).length;
+  const fullyCorrect = findings.filter(f => findingScore(f) === "correct").length;
+  const withFlag     = findings.filter(f => f.correct_elements.flag);
+  const uniqueFlags  = new Set(withFlag.map(f => f.flag_reported)).size;
+  const catOk        = withFlag.filter(f => f.correct_elements.category).length;
+  const hostOk       = withFlag.filter(f => f.correct_elements.host).length;
+
+  document.getElementById("m-total").textContent     = total;
+  document.getElementById("m-flags").textContent     = correctFlags;
+  document.getElementById("m-flags-pct").textContent = pct(correctFlags, total) + " of submissions";
+  document.getElementById("m-full").textContent      = fullyCorrect;
+  document.getElementById("m-unique").textContent    = uniqueFlags;
+  document.getElementById("m-cat").textContent       = pct(catOk, withFlag.length);
+  document.getElementById("m-host").textContent      = pct(hostOk, withFlag.length);
 }
 
-function formatTime(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toISOString().replace("T", " ").slice(0, 16);
-  } catch { return iso; }
-}
-
-function scoreClass(finding) {
-  const c = finding.correct_elements;
-  const all = c.flag && c.category && c.host && c.port;
-  const none = !c.flag && !c.category && !c.host && !c.port;
-  if (all) return "correct";
-  if (none) return "wrong";
-  return "partial";
-}
-
-function dotEl(val) {
-  const d = document.createElement("div");
-  d.className = "dot " + (val === true ? "ok" : val === false ? "bad" : "na");
-  return d;
-}
-
+/* ─── TABLE ─── */
 function renderTable(findings) {
   const tbody = document.getElementById("findings-body");
   tbody.innerHTML = "";
+
   if (findings.length === 0) {
     document.getElementById("empty-state").style.display = "block";
     return;
@@ -470,240 +392,388 @@ function renderTable(findings) {
   document.getElementById("empty-state").style.display = "none";
 
   const sorted = [...findings].sort((a, b) => new Date(b.time) - new Date(a.time));
-  for (const f of sorted) {
+
+  sorted.forEach((f, idx) => {
     const c = f.correct_elements;
-    const tr = document.createElement("tr");
 
-    const scoreC = scoreClass(f);
-    const label = scoreC === "correct" ? "All correct" : scoreC === "partial" ? "Partial" : "Incorrect";
-    const badgeCls = "badge badge-" + (scoreC === "correct" ? "correct" : scoreC === "partial" ? "partial" : "wrong");
+    const tr      = document.createElement("tr");
+    const infoTd  = document.createElement("td");
+    infoTd.className = "col-info";
+    const btn = document.createElement("button");
+    btn.className = "info-btn";
+    btn.textContent = "i";
+    btn.setAttribute("aria-label", "Show finding description");
+    btn.addEventListener("click", () => {
+      const dr   = document.getElementById(`detail-${idx}`);
+      const open = dr.classList.toggle("open");
+      btn.classList.toggle("active", open);
+    });
+    infoTd.appendChild(btn);
+    tr.appendChild(infoTd);
 
-    const shortFlag = f.flag_reported
-      ? f.flag_reported.replace("dta_flag{", "").replace("}", "").slice(0, 8) + "…"
-      : "—";
+    [
+      ["col-time", formatTime(f.time)],
+      ["col-flag", f.flag_reported     || "—"],
+      ["col-cat",  f.category_reported || "—"],
+      ["col-host", f.host              || "—"],
+      ["col-port", f.port != null ? f.port : "—"],
+    ].forEach(([cls, text]) => {
+      const td = document.createElement("td");
+      td.className = cls;
+      td.textContent = text;
+      tr.appendChild(td);
+    });
 
-    tr.innerHTML = `
-      <td class="col-time" title="${f.time}">${formatTime(f.time)}</td>
-      <td class="col-flag" title="${f.flag_reported || ''}" style="font-family: monospace; font-size: 12px;">${f.flag_reported || '—'}</td>
-      <td class="col-cat" title="${f.category_reported || ''}">${f.category_reported || '—'}</td>
-      <td class="col-host">${f.host || '—'}</td>
-      <td class="col-port">${f.port != null ? f.port : '—'}</td>
-      <td class="col-result"><div class="dot-row"></div></td>
-    `;
-
-    const dotRow = tr.querySelector(".dot-row");
-    [c.flag, c.category, c.host, c.port].forEach(v => dotRow.appendChild(dotEl(v)));
+    const resultTd = document.createElement("td");
+    resultTd.className = "col-result";
+    const dotRow = document.createElement("div");
+    dotRow.className = "dot-row";
+    [c.flag, c.category, c.host, c.port].forEach(v => {
+      const d = document.createElement("div");
+      d.className = "dot " + (v ? "ok" : "bad");
+      dotRow.appendChild(d);
+    });
+    resultTd.appendChild(dotRow);
+    tr.appendChild(resultTd);
     tbody.appendChild(tr);
-  }
-}
 
-function renderMetrics(findings) {
-  const total = findings.length;
-  const correctFlags = findings.filter(f => f.correct_elements.flag).length;
-  const fullyCorrect = findings.filter(f => {
-    const c = f.correct_elements;
-    return c.flag && c.category && c.host && (c.port !== false);
-  }).length;
-  const withFlag = findings.filter(f => f.correct_elements.flag);
-  const uniqueFlags = new Set(findings.filter(f => f.correct_elements.flag).map(f => f.flag_reported)).size;
-  const catOk = withFlag.filter(f => f.correct_elements.category).length;
-  const hostOk = withFlag.filter(f => f.correct_elements.host).length;
-
-  document.getElementById("m-total").textContent = total;
-  document.getElementById("m-flags").textContent = correctFlags;
-  document.getElementById("m-flags-pct").textContent = pct(correctFlags, total) + " of submissions";
-  document.getElementById("m-full").textContent = fullyCorrect;
-  document.getElementById("m-unique").textContent = uniqueFlags;
-  document.getElementById("m-unique-sub").textContent = "distinct valid flags";
-  document.getElementById("m-cat").textContent = pct(catOk, withFlag.length);
-  document.getElementById("m-host").textContent = pct(hostOk, withFlag.length);
-}
-
-function buildTimelineChart(findings) {
-  if (findings.length === 0) return;
-
-  const byMinute = {};
-  for (const f of findings) {
-    const t = new Date(f.time);
-    const key = t.toISOString().slice(0, 16);
-    byMinute[key] = (byMinute[key] || 0) + 1;
-  }
-
-  const keys = Object.keys(byMinute).sort();
-  const cumulative = [];
-  let running = 0;
-  const labels = keys.map((k, i) => {
-    running += byMinute[k];
-    cumulative.push(running);
-    return k.replace("T", " ");
-  });
-
-  const ctx = document.getElementById("chart-timeline").getContext("2d");
-  if (timelineChart) { timelineChart.destroy(); }
-  timelineChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Cumulative",
-          data: cumulative,
-          borderColor: "#378add",
-          backgroundColor: "rgba(55,138,221,0.12)",
-          fill: true,
-          tension: 0.3,
-          pointRadius: 3,
-          borderWidth: 2
-        },
-        {
-          label: "Per interval",
-          data: keys.map(k => byMinute[k]),
-          borderColor: "#1d9e75",
-          backgroundColor: "rgba(29,158,117,0)",
-          fill: false,
-          tension: 0.3,
-          pointRadius: 2,
-          borderWidth: 1.5,
-          borderDash: [4, 3]
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: {
-          ticks: { color: axisColor(), maxTicksLimit: 6, font: { size: 11 } },
-          grid: { color: gridColor() }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
-          grid: { color: gridColor() }
-        }
-      }
-    }
+    const detailTr = document.createElement("tr");
+    detailTr.className = "detail-row";
+    detailTr.id = `detail-${idx}`;
+    const detailTd = document.createElement("td");
+    detailTd.colSpan = 7;
+    const desc = f.desc
+      ? escHtml(f.desc)
+      : "<em style='color:var(--text-hint)'>incorrect flag — no description available</em>";
+    detailTd.innerHTML = `<strong>Description:</strong> ${desc}`;
+    detailTr.appendChild(detailTd);
+    tbody.appendChild(detailTr);
   });
 }
 
-function buildCorrectnessChart(findings) {
-  const fields = ["flag", "category", "host", "port"];
-  const labels = ["Flag", "Category", "Host", "Port"];
-  const correct = fields.map(f => findings.filter(x => x.correct_elements[f] === true).length);
-  const wrong   = fields.map(f => findings.filter(x => x.correct_elements[f] === false).length);
+/* ─── CHART DATA BUILDERS ─── */
 
-  const ctx = document.getElementById("chart-correctness").getContext("2d");
-  if (correctnessChart) { correctnessChart.destroy(); }
-  correctnessChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        { label: "Correct", data: correct, backgroundColor: "rgba(59,109,17,0.75)", borderWidth: 0 },
-        { label: "Wrong",   data: wrong,   backgroundColor: "rgba(163,45,45,0.65)", borderWidth: 0 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: {
-          stacked: true,
-          ticks: { color: axisColor(), font: { size: 12 } },
-          grid: { display: false }
-        },
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
-          grid: { color: gridColor() }
-        }
-      }
-    }
+/*
+ * Timeline: stacked cumulative lines (wrong / partial / correct) that sum to
+ * the total, plus the per-submission scatter dots drawn on top.
+ *
+ * Dataset layout (order matters for fill: '-1'):
+ *   0  wrongLine   – cumulative wrong count       fill 'origin'  red
+ *   1  partialLine – cumulative wrong+partial      fill '-1'      amber
+ *   2  correctLine – cumulative wrong+partial+correct = total  fill '-1'  green
+ *   3  scatterDots – individual submissions, colored, on top
+ */
+function getTimelineData(findings) {
+  const sorted = [...findings].sort((a, b) => new Date(a.time) - new Date(b.time));
+  let cumW = 0, cumP = 0, cumC = 0;
+  const wrongLine = [], partialLine = [], correctLine = [];
+
+  sorted.forEach(f => {
+    const s = findingScore(f);
+    if      (s === "wrong")   cumW++;
+    else if (s === "partial") cumP++;
+    else                      cumC++;
+    const x = new Date(f.time).getTime();
+    wrongLine.push({   x, y: cumW });
+    partialLine.push({ x, y: cumW + cumP });
+    correctLine.push({ x, y: cumW + cumP + cumC });
   });
+
+  return {
+    sorted,
+    points:      sorted.map((f, i) => ({ x: new Date(f.time).getTime(), y: i + 1 })),
+    colors:      sorted.map(findingColorHex),
+    wrongLine, partialLine, correctLine
+  };
 }
 
-function buildCategoryChart(findings) {
+/*
+ * Correctness breakdown per field.
+ * Green  = field correct.
+ * Amber  = field wrong BUT flag was correct (agent found it, got this detail wrong).
+ *          For the Flag field itself this is always 0.
+ * Red    = flag wrong (agent missed the finding entirely).
+ */
+function getCorrectnessData(findings) {
+  const fields      = ["flag", "category", "host", "port"];
+  const wrongFlagN  = findings.filter(x => !x.correct_elements.flag).length;
+
+  const correct      = fields.map(f => findings.filter(x => x.correct_elements[f] === true).length);
+  const partialWrong = fields.map(f =>
+    f === "flag" ? 0
+    : findings.filter(x => x.correct_elements.flag === true && x.correct_elements[f] === false).length
+  );
+  const flagWrong    = fields.map(() => wrongFlagN);
+
+  return { correct, partialWrong, flagWrong };
+}
+
+/*
+ * Category chart: each reported-category bucket split into
+ * fully correct / partial / wrong-flag submissions.
+ */
+function getCategoryData(findings) {
   const cats = {};
   for (const f of findings) {
     const cat = f.category_reported || "unknown";
-    if (!cats[cat]) cats[cat] = { correct: 0, wrong: 0 };
-    if (f.correct_elements.category) cats[cat].correct++;
-    else cats[cat].wrong++;
+    if (!cats[cat]) cats[cat] = { correct: 0, partial: 0, wrong: 0 };
+    const s = findingScore(f);
+    if      (s === "correct") cats[cat].correct++;
+    else if (s === "partial") cats[cat].partial++;
+    else                      cats[cat].wrong++;
   }
-
   const labels = Object.keys(cats).sort();
-  const correct = labels.map(l => cats[l].correct);
-  const wrong   = labels.map(l => cats[l].wrong);
+  return {
+    labels,
+    correct: labels.map(l => cats[l].correct),
+    partial: labels.map(l => cats[l].partial),
+    wrong:   labels.map(l => cats[l].wrong)
+  };
+}
 
-  const legend = document.getElementById("legend-category");
-  legend.innerHTML = `
-    <span><span class="swatch" style="background:rgba(59,109,17,0.75)"></span>Correct category</span>
-    <span><span class="swatch" style="background:rgba(163,45,45,0.65)"></span>Wrong category</span>
-  `;
+/* ─── CHART INIT — first page load, default animation plays ─── */
+function initTimelineChart(findings) {
+  const { sorted, points, colors, wrongLine, partialLine, correctLine } = getTimelineData(findings);
+  timelineSorted = sorted;
 
+  const dk  = isDark();
+  const ttBg     = dk ? "#3a3936" : "#ffffff";
+  const ttBorder = dk ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.14)";
+  const ttTitle  = dk ? "#f0ece4" : "#1a1a18";
+  const ttBody   = dk ? "#b4b2a9" : "#5f5e5a";
+  const connLine = dk ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)";
+
+  const ctx = document.getElementById("chart-timeline").getContext("2d");
+  timelineChart = new Chart(ctx, {
+    type: "scatter",
+    data: {
+      datasets: [
+        /* 0 – wrong (bottom fill) */
+        {
+          data:            wrongLine,
+          showLine:        true,
+          fill:            "origin",
+          borderColor:     "rgba(163,45,45,0.7)",
+          backgroundColor: "rgba(163,45,45,0.1)",
+          pointRadius:     0,
+          borderWidth:     1.5,
+          tension:         0.3
+        },
+        /* 1 – partial (fills up from wrong) */
+        {
+          data:            partialLine,
+          showLine:        true,
+          fill:            "-1",
+          borderColor:     "rgba(133,79,11,0.7)",
+          backgroundColor: "rgba(133,79,11,0.1)",
+          pointRadius:     0,
+          borderWidth:     1.5,
+          tension:         0.3
+        },
+        /* 2 – correct (fills up from partial) */
+        {
+          data:            correctLine,
+          showLine:        true,
+          fill:            "-1",
+          borderColor:     "rgba(59,109,17,0.7)",
+          backgroundColor: "rgba(59,109,17,0.1)",
+          pointRadius:     0,
+          borderWidth:     1.5,
+          tension:         0.3
+        },
+        /* 3 – per-submission scatter dots drawn last = on top */
+        {
+          data:               points,
+          pointBackgroundColor: colors,
+          pointBorderColor:     colors,
+          pointRadius:          7,
+          pointHoverRadius:     9,
+          showLine:             true,
+          borderColor:          connLine,
+          borderWidth:          1,
+          tension:              0.2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "nearest", intersect: true },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: ttBg,
+          borderColor:     ttBorder,
+          borderWidth:     0.5,
+          titleColor:      ttTitle,
+          bodyColor:       ttBody,
+          bodyFont:        { family: "monospace", size: 12 },
+          padding:         10,
+          filter: (item) => item.datasetIndex === 3, /* only the scatter dots get tooltips */
+          callbacks: {
+            title: (items) =>
+              new Date(items[0].parsed.x).toISOString().replace("T", " ").slice(0, 16) + " UTC",
+            label: (item) => {
+              const f = timelineSorted[item.dataIndex];
+              if (!f) return "";
+              const c = f.correct_elements;
+              return [
+                "  Flag:     " + (c.flag     ? "✓" : "✗"),
+                "  Category: " + (c.category ? "✓" : "✗"),
+                "  Host:     " + (c.host     ? "✓" : "✗"),
+                "  Port:     " + (c.port     ? "✓" : "✗"),
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: "linear",
+          ticks: {
+            callback:      (val) => fmtAxisTick(val),
+            maxTicksLimit: 8,
+            maxRotation:   35,
+            color:         axisColor(),
+            font:          { size: 11 }
+          },
+          grid: { color: gridColor() }
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: "cumulative", color: axisColor(), font: { size: 10 } },
+          ticks: { stepSize: 1, color: axisColor(), font: { size: 11 } },
+          grid:  { color: gridColor() }
+        }
+      }
+    }
+  });
+}
+
+function initCorrectnessChart(findings) {
+  const { correct, partialWrong, flagWrong } = getCorrectnessData(findings);
+  const ctx = document.getElementById("chart-correctness").getContext("2d");
+  correctnessChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Flag", "Category", "Host", "Port"],
+      datasets: [
+        { label: "Correct",          data: correct,      backgroundColor: "rgba(59,109,17,0.85)",  borderWidth: 0 },
+        { label: "Wrong detail",     data: partialWrong, backgroundColor: "rgba(133,79,11,0.85)", borderWidth: 0 },
+        { label: "Wrong flag",       data: flagWrong,    backgroundColor: "rgba(163,45,45,0.75)",  borderWidth: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, ticks: { color: axisColor(), font: { size: 12 } }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } }, grid: { color: gridColor() } }
+      }
+    }
+  });
+}
+
+function initCategoryChart(findings) {
+  const { labels, correct, partial, wrong } = getCategoryData(findings);
   const ctx = document.getElementById("chart-categories").getContext("2d");
-  if (categoryChart) { categoryChart.destroy(); }
   categoryChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels,
       datasets: [
-        { label: "Correct", data: correct, backgroundColor: "rgba(59,109,17,0.75)", borderWidth: 0 },
-        { label: "Wrong",   data: wrong,   backgroundColor: "rgba(163,45,45,0.65)", borderWidth: 0 }
+        { label: "Correct",  data: correct,  backgroundColor: "rgba(59,109,17,0.85)", borderWidth: 0 },
+        { label: "Partial",  data: partial,  backgroundColor: "rgba(133,79,11,0.85)", borderWidth: 0 },
+        { label: "Wrong",    data: wrong,    backgroundColor: "rgba(163,45,45,0.75)", borderWidth: 0 }
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: {
-          stacked: true,
-          ticks: { color: axisColor(), font: { size: 11 }, autoSkip: false, maxRotation: 35 },
-          grid: { display: false }
-        },
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
-          grid: { color: gridColor() }
-        }
+        x: { stacked: true, ticks: { color: axisColor(), font: { size: 11 }, autoSkip: false, maxRotation: 35 }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } }, grid: { color: gridColor() } }
       }
     }
   });
 }
 
+/* ─── CHART UPDATE — subsequent refreshes ───────────────────────────────────
+ * Uses a short 350 ms ease instead of the instant "none" or the full 1 s
+ * initial animation.  Just enough motion to signal the data changed.
+ */
+const REFRESH_ANIM = { duration: 350, easing: "easeInOutSine" };
+
+function updateTimelineChart(findings) {
+  const { sorted, points, colors, wrongLine, partialLine, correctLine } = getTimelineData(findings);
+  timelineSorted = sorted;
+  const ds = timelineChart.data.datasets;
+  ds[0].data               = wrongLine;
+  ds[1].data               = partialLine;
+  ds[2].data               = correctLine;
+  ds[3].data               = points;
+  ds[3].pointBackgroundColor = colors;
+  ds[3].pointBorderColor     = colors;
+  ds[3].borderColor = isDark() ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)";
+  timelineChart.options.animation = REFRESH_ANIM;
+  timelineChart.update();
+}
+
+function updateCorrectnessChart(findings) {
+  const { correct, partialWrong, flagWrong } = getCorrectnessData(findings);
+  const ds = correctnessChart.data.datasets;
+  ds[0].data = correct;
+  ds[1].data = partialWrong;
+  ds[2].data = flagWrong;
+  correctnessChart.options.animation = REFRESH_ANIM;
+  correctnessChart.update();
+}
+
+function updateCategoryChart(findings) {
+  const { labels, correct, partial, wrong } = getCategoryData(findings);
+  categoryChart.data.labels      = labels;
+  const ds = categoryChart.data.datasets;
+  ds[0].data = correct;
+  ds[1].data = partial;
+  ds[2].data = wrong;
+  categoryChart.options.animation = REFRESH_ANIM;
+  categoryChart.update();
+}
+
+/* ─── MAIN LOAD LOOP ─── */
 async function loadAll() {
   const dot = document.getElementById("status-dot");
   dot.className = "status-dot loading";
-  document.getElementById("last-refresh").textContent = "Loading…";
   document.getElementById("error-state").style.display = "none";
 
   try {
-    const keys = await listFindings();
+    const keys     = await listFindings();
     const findings = await Promise.all(keys.map(fetchFinding));
 
     renderMetrics(findings);
     renderTable(findings);
-    buildTimelineChart(findings);
-    buildCorrectnessChart(findings);
-    buildCategoryChart(findings);
+
+    if (!chartsInitialized) {
+      initTimelineChart(findings);
+      initCorrectnessChart(findings);
+      initCategoryChart(findings);
+      chartsInitialized = true;
+    } else {
+      updateTimelineChart(findings);
+      updateCorrectnessChart(findings);
+      updateCategoryChart(findings);
+    }
 
     dot.className = "status-dot";
     document.getElementById("last-refresh").textContent =
-      "Last updated " + new Date().toISOString().replace("T"," ").slice(0,16) + " UTC";
+      "Last updated " + new Date().toISOString().replace("T", " ").slice(0, 16) + " UTC";
   } catch (err) {
     console.error(err);
     dot.className = "status-dot error";
     document.getElementById("last-refresh").textContent = "Error loading data";
-    document.getElementById("error-state").style.display = "block";
-    document.getElementById("error-state").textContent =
-      "Could not load findings: " + err.message + ". Check BUCKET_URL and CORS settings.";
+    const el = document.getElementById("error-state");
+    el.style.display = "block";
+    el.textContent = "Could not load findings: " + err.message + ". Check BUCKET_URL and CORS settings.";
   }
 }
 
