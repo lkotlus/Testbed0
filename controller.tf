@@ -2,6 +2,7 @@
 resource "aws_network_interface" "controller_instance_primary_eni" {
   subnet_id       = aws_subnet.external_subnet.id
   security_groups = [aws_security_group.external_subnet_sg.id]
+  private_ips     = ["10.0.1.10"]
   tags = {
     Name = "controller-primary-eni"
   }
@@ -12,6 +13,7 @@ resource "aws_network_interface" "controller_instance_eni" {
   subnet_id         = aws_subnet.internal_subnet.id
   security_groups   = [aws_security_group.internal_subnet_sg.id]
   source_dest_check = false
+  private_ips     = ["10.0.2.10"]
   tags = {
     Name = "controller-secondary-eni"
   }

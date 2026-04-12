@@ -2,6 +2,7 @@ resource "aws_instance" "vpn_instance" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.vpn_subnet.id
+  private_ip                  = "10.0.5.10"
   vpc_security_group_ids      = [aws_security_group.vpn_sg.id]
   source_dest_check           = false
 

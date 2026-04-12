@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Assessment Scoring Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface-secondary: #f1efe8;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --text: #1a1a18;
+    --text-muted: #5f5e5a;
+    --text-hint: #888780;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --correct: #3b6d11;
+    --correct-bg: #eaf3de;
+    --partial: #854f0b;
+    --partial-bg: #faeeda;
+    --wrong: #a32d2d;
+    --wrong-bg: #fcebeb;
+    --blue: #185fa5;
+    --blue-bg: #e6f1fb;
+    --chart-1: #378add;
+    --chart-2: #639922;
+    --chart-3: #d85a30;
+    --chart-4: #7f77dd;
+    --chart-5: #1d9e75;
+    --chart-6: #ba7517;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1d1b;
+      --surface: #2a2926;
+      --surface-secondary: #333230;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+      --text: #f0ece4;
+      --text-muted: #b4b2a9;
+      --text-hint: #888780;
+      --correct: #c0dd97;
+      --correct-bg: #27500a;
+      --partial: #fac775;
+      --partial-bg: #633806;
+      --wrong: #f09595;
+      --wrong-bg: #791f1f;
+      --blue: #85b7eb;
+      --blue-bg: #0c447c;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  header .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--correct);
+    flex-shrink: 0;
+  }
+
+  .status-dot.loading { background: var(--partial); }
+  .status-dot.error { background: var(--wrong); }
+
+  #last-refresh {
+    font-size: 12px;
+    color: var(--text-hint);
+  }
+
+  button#refresh-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button#refresh-btn:hover { background: var(--surface-secondary); }
+
+  main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .metric-card {
+    background: var(--surface-secondary);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    border: 0.5px solid var(--border);
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .metric-sub {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin-top: 2px;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+
+  .card-full { grid-column: 1 / -1; }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 6px 8px 8px;
+    border-bottom: 0.5px solid var(--border-strong);
+  }
+
+  td {
+    padding: 7px 8px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .col-time   { width: 148px; }
+  .col-flag   { width: 230px; }
+  .col-cat    { width: 110px; }
+  .col-host   { width: 110px; }
+  .col-port   { width: 70px; }
+  .col-result { width: 90px; text-align: center; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-correct  { background: var(--correct-bg); color: var(--correct); }
+  .badge-partial  { background: var(--partial-bg); color: var(--partial); }
+  .badge-wrong    { background: var(--wrong-bg);   color: var(--wrong);   }
+
+  .dot-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot.ok  { background: var(--correct); }
+  .dot.bad { background: var(--wrong); }
+  .dot.na  { background: var(--border-strong); }
+
+  #empty-state, #error-state {
+    display: none;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-hint);
+    font-size: 14px;
+  }
+
+  .config-bar {
+    background: var(--blue-bg);
+    color: var(--blue);
+    font-size: 12px;
+    padding: 8px 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .config-bar code {
+    font-family: monospace;
+    font-size: 12px;
+    opacity: 0.85;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .legend .swatch {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="config-bar" id="config-bar">
+  Fetching from: <code id="bucket-url-display"></code>
+</div>
+
+<header>
+  <div>
+    <h1>LLM Assessment — Scoring Dashboard</h1>
+    <div class="subtitle">Automatically refreshes every 30 seconds</div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot loading" id="status-dot"></div>
+    <span id="last-refresh">Loading…</span>
+    <button id="refresh-btn">Refresh</button>
+  </div>
+</header>
+
+<main>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Total submissions</div>
+      <div class="metric-value" id="m-total">—</div>
+      <div class="metric-sub">across all agents</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Correct flags</div>
+      <div class="metric-value" id="m-flags">—</div>
+      <div class="metric-sub" id="m-flags-pct">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Fully correct</div>
+      <div class="metric-value" id="m-full">—</div>
+      <div class="metric-sub">flag + cat + host + port</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Unique flags found</div>
+      <div class="metric-value" id="m-unique">—</div>
+      <div class="metric-sub" id="m-unique-sub">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Category accuracy</div>
+      <div class="metric-value" id="m-cat">—</div>
+      <div class="metric-sub">of submissions w/ correct flag</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Host accuracy</div>
+      <div class="metric-value" id="m-host">—</div>
+      <div class="metric-sub">of submissions w/ correct flag</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="card">
+      <div class="card-title">Submissions over time</div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="chart-timeline" role="img" aria-label="Line chart of submissions over time">Submission timeline chart.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Correctness breakdown</div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="chart-correctness" role="img" aria-label="Bar chart of correctness per field">Correctness breakdown chart.</canvas>
+      </div>
+    </div>
+    <div class="card card-full">
+      <div class="card-title">Submissions by category</div>
+      <div id="legend-category" class="legend"></div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="chart-categories" role="img" aria-label="Bar chart of submissions per vulnerability category">Category chart.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All findings</div>
+    <div id="error-state">Could not load findings. Check the bucket URL and CORS configuration.</div>
+    <div id="empty-state">No findings submitted yet.</div>
+    <div style="overflow-x: auto;">
+      <table id="findings-table">
+        <thead>
+          <tr>
+            <th class="col-time">Time (UTC)</th>
+            <th class="col-flag">Flag</th>
+            <th class="col-cat">Category</th>
+            <th class="col-host">Host</th>
+            <th class="col-port">Port</th>
+            <th class="col-result" title="Flag / Category / Host / Port">F C H P</th>
+          </tr>
+        </thead>
+        <tbody id="findings-body"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const BUCKET_URL = "https://assessment-findings.s3.amazonaws.com";
+const FINDINGS_PREFIX = "findings/";
+const REFRESH_INTERVAL_MS = 10000;
+
+const CHART_COLORS = ["#378add","#639922","#d85a30","#7f77dd","#1d9e75","#ba7517","#d4537e","#888780"];
+
+document.getElementById("bucket-url-display").textContent = BUCKET_URL + "/" + FINDINGS_PREFIX;
+
+let timelineChart = null, correctnessChart = null, categoryChart = null;
+
+function isDark() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function axisColor() { return isDark() ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"; }
+function gridColor() { return isDark() ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"; }
+
+async function listFindings() {
+  const url = `${BUCKET_URL}?list-type=2&prefix=${FINDINGS_PREFIX}&max-keys=1000`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`S3 list failed: ${res.status}`);
+  const text = await res.text();
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "application/xml");
+  return Array.from(xml.querySelectorAll("Contents Key"))
+    .map(k => k.textContent)
+    .filter(k => k.endsWith(".json") && k !== FINDINGS_PREFIX);
+}
+
+async function fetchFinding(key) {
+  const res = await fetch(`${BUCKET_URL}/${key}`);
+  if (!res.ok) throw new Error(`fetch failed: ${key}`);
+  return res.json();
+}
+
+function pct(n, d) {
+  if (d === 0) return "—";
+  return Math.round((n / d) * 100) + "%";
+}
+
+function formatTime(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toISOString().replace("T", " ").slice(0, 16);
+  } catch { return iso; }
+}
+
+function scoreClass(finding) {
+  const c = finding.correct_elements;
+  const all = c.flag && c.category && c.host && c.port;
+  const none = !c.flag && !c.category && !c.host && !c.port;
+  if (all) return "correct";
+  if (none) return "wrong";
+  return "partial";
+}
+
+function dotEl(val) {
+  const d = document.createElement("div");
+  d.className = "dot " + (val === true ? "ok" : val === false ? "bad" : "na");
+  return d;
+}
+
+function renderTable(findings) {
+  const tbody = document.getElementById("findings-body");
+  tbody.innerHTML = "";
+  if (findings.length === 0) {
+    document.getElementById("empty-state").style.display = "block";
+    return;
+  }
+  document.getElementById("empty-state").style.display = "none";
+
+  const sorted = [...findings].sort((a, b) => new Date(b.time) - new Date(a.time));
+  for (const f of sorted) {
+    const c = f.correct_elements;
+    const tr = document.createElement("tr");
+
+    const scoreC = scoreClass(f);
+    const label = scoreC === "correct" ? "All correct" : scoreC === "partial" ? "Partial" : "Incorrect";
+    const badgeCls = "badge badge-" + (scoreC === "correct" ? "correct" : scoreC === "partial" ? "partial" : "wrong");
+
+    const shortFlag = f.flag_reported
+      ? f.flag_reported.replace("dta_flag{", "").replace("}", "").slice(0, 8) + "…"
+      : "—";
+
+    tr.innerHTML = `
+      <td class="col-time" title="${f.time}">${formatTime(f.time)}</td>
+      <td class="col-flag" title="${f.flag_reported || ''}" style="font-family: monospace; font-size: 12px;">${f.flag_reported || '—'}</td>
+      <td class="col-cat" title="${f.category_reported || ''}">${f.category_reported || '—'}</td>
+      <td class="col-host">${f.host || '—'}</td>
+      <td class="col-port">${f.port != null ? f.port : '—'}</td>
+      <td class="col-result"><div class="dot-row"></div></td>
+    `;
+
+    const dotRow = tr.querySelector(".dot-row");
+    [c.flag, c.category, c.host, c.port].forEach(v => dotRow.appendChild(dotEl(v)));
+    tbody.appendChild(tr);
+  }
+}
+
+function renderMetrics(findings) {
+  const total = findings.length;
+  const correctFlags = findings.filter(f => f.correct_elements.flag).length;
+  const fullyCorrect = findings.filter(f => {
+    const c = f.correct_elements;
+    return c.flag && c.category && c.host && (c.port !== false);
+  }).length;
+  const withFlag = findings.filter(f => f.correct_elements.flag);
+  const uniqueFlags = new Set(findings.filter(f => f.correct_elements.flag).map(f => f.flag_reported)).size;
+  const catOk = withFlag.filter(f => f.correct_elements.category).length;
+  const hostOk = withFlag.filter(f => f.correct_elements.host).length;
+
+  document.getElementById("m-total").textContent = total;
+  document.getElementById("m-flags").textContent = correctFlags;
+  document.getElementById("m-flags-pct").textContent = pct(correctFlags, total) + " of submissions";
+  document.getElementById("m-full").textContent = fullyCorrect;
+  document.getElementById("m-unique").textContent = uniqueFlags;
+  document.getElementById("m-unique-sub").textContent = "distinct valid flags";
+  document.getElementById("m-cat").textContent = pct(catOk, withFlag.length);
+  document.getElementById("m-host").textContent = pct(hostOk, withFlag.length);
+}
+
+function buildTimelineChart(findings) {
+  if (findings.length === 0) return;
+
+  const byMinute = {};
+  for (const f of findings) {
+    const t = new Date(f.time);
+    const key = t.toISOString().slice(0, 16);
+    byMinute[key] = (byMinute[key] || 0) + 1;
+  }
+
+  const keys = Object.keys(byMinute).sort();
+  const cumulative = [];
+  let running = 0;
+  const labels = keys.map((k, i) => {
+    running += byMinute[k];
+    cumulative.push(running);
+    return k.replace("T", " ");
+  });
+
+  const ctx = document.getElementById("chart-timeline").getContext("2d");
+  if (timelineChart) { timelineChart.destroy(); }
+  timelineChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Cumulative",
+          data: cumulative,
+          borderColor: "#378add",
+          backgroundColor: "rgba(55,138,221,0.12)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          borderWidth: 2
+        },
+        {
+          label: "Per interval",
+          data: keys.map(k => byMinute[k]),
+          borderColor: "#1d9e75",
+          backgroundColor: "rgba(29,158,117,0)",
+          fill: false,
+          tension: 0.3,
+          pointRadius: 2,
+          borderWidth: 1.5,
+          borderDash: [4, 3]
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: { color: axisColor(), maxTicksLimit: 6, font: { size: 11 } },
+          grid: { color: gridColor() }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
+          grid: { color: gridColor() }
+        }
+      }
+    }
+  });
+}
+
+function buildCorrectnessChart(findings) {
+  const fields = ["flag", "category", "host", "port"];
+  const labels = ["Flag", "Category", "Host", "Port"];
+  const correct = fields.map(f => findings.filter(x => x.correct_elements[f] === true).length);
+  const wrong   = fields.map(f => findings.filter(x => x.correct_elements[f] === false).length);
+
+  const ctx = document.getElementById("chart-correctness").getContext("2d");
+  if (correctnessChart) { correctnessChart.destroy(); }
+  correctnessChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "Correct", data: correct, backgroundColor: "rgba(59,109,17,0.75)", borderWidth: 0 },
+        { label: "Wrong",   data: wrong,   backgroundColor: "rgba(163,45,45,0.65)", borderWidth: 0 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { color: axisColor(), font: { size: 12 } },
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
+          grid: { color: gridColor() }
+        }
+      }
+    }
+  });
+}
+
+function buildCategoryChart(findings) {
+  const cats = {};
+  for (const f of findings) {
+    const cat = f.category_reported || "unknown";
+    if (!cats[cat]) cats[cat] = { correct: 0, wrong: 0 };
+    if (f.correct_elements.category) cats[cat].correct++;
+    else cats[cat].wrong++;
+  }
+
+  const labels = Object.keys(cats).sort();
+  const correct = labels.map(l => cats[l].correct);
+  const wrong   = labels.map(l => cats[l].wrong);
+
+  const legend = document.getElementById("legend-category");
+  legend.innerHTML = `
+    <span><span class="swatch" style="background:rgba(59,109,17,0.75)"></span>Correct category</span>
+    <span><span class="swatch" style="background:rgba(163,45,45,0.65)"></span>Wrong category</span>
+  `;
+
+  const ctx = document.getElementById("chart-categories").getContext("2d");
+  if (categoryChart) { categoryChart.destroy(); }
+  categoryChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "Correct", data: correct, backgroundColor: "rgba(59,109,17,0.75)", borderWidth: 0 },
+        { label: "Wrong",   data: wrong,   backgroundColor: "rgba(163,45,45,0.65)", borderWidth: 0 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { color: axisColor(), font: { size: 11 }, autoSkip: false, maxRotation: 35 },
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } },
+          grid: { color: gridColor() }
+        }
+      }
+    }
+  });
+}
+
+async function loadAll() {
+  const dot = document.getElementById("status-dot");
+  dot.className = "status-dot loading";
+  document.getElementById("last-refresh").textContent = "Loading…";
+  document.getElementById("error-state").style.display = "none";
+
+  try {
+    const keys = await listFindings();
+    const findings = await Promise.all(keys.map(fetchFinding));
+
+    renderMetrics(findings);
+    renderTable(findings);
+    buildTimelineChart(findings);
+    buildCorrectnessChart(findings);
+    buildCategoryChart(findings);
+
+    dot.className = "status-dot";
+    document.getElementById("last-refresh").textContent =
+      "Last updated " + new Date().toISOString().replace("T"," ").slice(0,16) + " UTC";
+  } catch (err) {
+    console.error(err);
+    dot.className = "status-dot error";
+    document.getElementById("last-refresh").textContent = "Error loading data";
+    document.getElementById("error-state").style.display = "block";
+    document.getElementById("error-state").textContent =
+      "Could not load findings: " + err.message + ". Check BUCKET_URL and CORS settings.";
+  }
+}
+
+document.getElementById("refresh-btn").addEventListener("click", loadAll);
+loadAll();
+setInterval(loadAll, REFRESH_INTERVAL_MS);
+</script>
+</body>
+</html>

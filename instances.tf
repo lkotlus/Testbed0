@@ -2,6 +2,7 @@
 resource "aws_network_interface" "external_site_primary_eni" {
   subnet_id       = aws_subnet.external_subnet.id
   security_groups = [aws_security_group.external_subnet_sg.id]
+  private_ips     = ["10.0.1.50"]
   tags = {
     Name = "external-site-primary-eni"
   }
@@ -11,6 +12,7 @@ resource "aws_network_interface" "external_site_primary_eni" {
 resource "aws_network_interface" "external_site_eni" {
   subnet_id       = aws_subnet.internal_subnet.id
   security_groups = [aws_security_group.internal_subnet_sg.id]
+  private_ips     = ["10.0.2.50"]
   tags = {
     Name = "external-site-secondary-eni"
   }
@@ -66,6 +68,7 @@ resource "aws_instance" "internal_1" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
   subnet_id                   = aws_subnet.internal_subnet.id
+  private_ip                  = "10.0.2.60"
   vpc_security_group_ids      = [aws_security_group.internal_subnet_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.managed_instance_profile.name
   key_name                    = aws_key_pair.managed_nodes.key_name
@@ -105,6 +108,7 @@ resource "aws_instance" "internal_2" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
   subnet_id                   = aws_subnet.internal_subnet.id
+  private_ip                  = "10.0.2.70"
   vpc_security_group_ids      = [aws_security_group.internal_subnet_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.managed_instance_profile.name
   key_name                    = aws_key_pair.managed_nodes.key_name
