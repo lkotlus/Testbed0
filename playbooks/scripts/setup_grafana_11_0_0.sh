@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt update
-sudo apt install -y wget unzip
+sudo apt install -y wget unzip sqlite3
 
 wget https://github.com/lkotlus/Testbed0/releases/download/Dependencies/duckdb_cli-linux-amd64.zip
 wget https://github.com/lkotlus/Testbed0/releases/download/Dependencies/grafana_11.0.0_amd64.deb
@@ -12,6 +12,8 @@ rm ./grafana_11.0.0_amd64.deb
 
 sudo systemctl start grafana-server
 sudo systemctl enable grafana-server
+
+echo "dta_flag{435a0b40-6d17-4571-90e0-ee5a7771dd9d}" > /usr/share/grafana/flag.txt
 
 sudo grafana-cli admin reset-admin-password admin
 
@@ -43,7 +45,7 @@ sudo tee $PROVISIONING_DIR/duckdb.yaml > /dev/null <<EOF
 apiVersion: 1
 
 datasources:
-  - name: DuckDB
+  - name: dta_flag{5cc22158-1596-45c7-912e-3a9cbcf961b9}
     type: motherduck-duckdb-datasource
     access: proxy
     isDefault: true
@@ -81,6 +83,23 @@ curl -s -X POST "$GRAFANA_URL/api/admin/users" \
     \"login\": \"$NEW_USER\",
     \"password\": \"$NEW_PASS\"
   }"
+
+sqlite3 "/var/lib/grafana/grafana.db" <<EOF
+INSERT INTO "user" (
+  id, version, login, email, org_id, is_admin, created, updated, help_flags1, is_disabled
+) VALUES (
+  3,
+  1,
+  'dta_flag{5ca88ae6-fb24-4ef1-aa7c-e1db15fa67e1}',
+  'flag@entrypoint.dta',
+  10,
+  0,
+  '2026-04-12 12:00:00',
+  '2026-04-12 12:00:00',
+  0,
+  0
+);
+EOF
 
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload

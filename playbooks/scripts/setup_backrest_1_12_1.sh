@@ -13,4 +13,6 @@ mkdir ~/.config/
 mkdir ~/.config/backrest/
 mv ~/config.json ~/.config/backrest/config.json
 
+echo "dta_flag{71da641a-00d2-47c7-a14e-8ae08bca353c}" > /root/flag.txt
+
 ./install.sh

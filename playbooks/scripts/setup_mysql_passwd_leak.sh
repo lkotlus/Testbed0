@@ -18,6 +18,8 @@ do
     sql_values+=("('$user','$hashed')")
 done
 
+sql_values+=("('flag','dta_flag{837b838d-7935-4bd7-8230-bb82961f7f5d}')")
+
 password_db=$(IFS=,; echo "${sql_values[*]}")
 
 # now for the mysql server

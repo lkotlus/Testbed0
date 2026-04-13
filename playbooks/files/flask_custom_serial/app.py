@@ -4,6 +4,8 @@ from io import BytesIO
 import pickle
 import uuid
 
+# dta_flag{2daf5c09-b62c-453e-92c8-1c2b572e0002}
+
 app = Flask(__name__)
 
 page = """

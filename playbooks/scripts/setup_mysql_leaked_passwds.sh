@@ -14,4 +14,6 @@ rm $SSHDCLOUDPATH
 sudo useradd -m $USERNAME
 sudo chpasswd <<< "$USERNAME:$PASSWORD"
 
+echo "dta_flag{cfa34008-38db-4f22-9756-d90f43c215c4}" > /home/mgebril/flag.txt
+
 sudo systemctl restart ssh
