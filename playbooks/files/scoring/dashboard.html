@@ -207,11 +207,6 @@
       <div class="metric-sub">all four fields</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Unique flags found</div>
-      <div class="metric-value" id="m-unique">—</div>
-      <div class="metric-sub">distinct valid flags</div>
-    </div>
-    <div class="metric-card">
       <div class="metric-label">Category accuracy</div>
       <div class="metric-value" id="m-cat">—</div>
       <div class="metric-sub">of correct-flag submissions</div>
@@ -221,11 +216,16 @@
       <div class="metric-value" id="m-host">—</div>
       <div class="metric-sub">of correct-flag submissions</div>
     </div>
+    <div class="metric-card">
+      <div class="metric-label">Port accuracy</div>
+      <div class="metric-value" id="m-port">—</div>
+      <div class="metric-sub">of correct-flag submissions</div>
+    </div>
   </div>
 
   <div class="chart-grid">
     <div class="card">
-      <div class="card-title">Submissions over time</div>
+      <div class="card-title">Correctness over time</div>
       <div class="legend">
         <span><span class="swatch" style="background:#3b6d11"></span>Perfect (all fields correct)</span>
         <span><span class="swatch" style="background:#854f0b"></span>Partial (correct flag, wrong details)</span>
@@ -239,22 +239,21 @@
       <div class="card-title">Correctness breakdown</div>
       <div class="legend">
         <span><span class="swatch" style="background:rgba(59,109,17,0.85)"></span>Correct</span>
-        <span><span class="swatch" style="background:rgba(133,79,11,0.85)"></span>Wrong detail (flag correct)</span>
-        <span><span class="swatch" style="background:rgba(163,45,45,0.75)"></span>Wrong flag</span>
+        <span><span class="swatch" style="background:rgba(163,45,45,0.75)"></span>Incorrect</span>
       </div>
       <div style="position: relative; width: 100%; height: 220px;">
         <canvas id="chart-correctness" role="img" aria-label="Stacked bar chart of correctness per field">Correctness breakdown chart.</canvas>
       </div>
     </div>
     <div class="card card-full">
-      <div class="card-title">Submissions by category</div>
-      <div class="legend">
-        <span><span class="swatch" style="background:rgba(59,109,17,0.85)"></span>Fully correct</span>
-        <span><span class="swatch" style="background:rgba(133,79,11,0.85)"></span>Partial (correct flag)</span>
-        <span><span class="swatch" style="background:rgba(163,45,45,0.75)"></span>Wrong flag</span>
+      <div class="card-title">Submissions over time</div>
+      <div class="legend" id="legend-category">
+        <span><span class="swatch" style="background:#3b6d11"></span>Perfect (all fields correct)</span>
+        <span><span class="swatch" style="background:#854f0b"></span>Partial (correct flag, wrong details)</span>
+        <span><span class="swatch" style="background:#a32d2d"></span>Incorrect (wrong flag)</span>
       </div>
       <div style="position: relative; width: 100%; height: 220px;">
-        <canvas id="chart-categories" role="img" aria-label="Stacked bar chart of submissions by reported category">Category chart.</canvas>
+        <canvas id="chart-categories" role="img" aria-label="Scatter chart of submissions over time, dots colored by reported category">Category chart.</canvas>
       </div>
     </div>
   </div>
@@ -283,25 +282,18 @@
 </main>
 
 <script>
-/* ─── CONFIGURATION ─────────────────────────────────────────────────────── */
 const BUCKET_URL          = "https://assessment-findings.s3.amazonaws.com";
 const FINDINGS_PREFIX     = "findings/";
 const REFRESH_INTERVAL_MS = 30_000;
-/* ────────────────────────────────────────────────────────────────────────── */
 
 document.getElementById("bucket-url-display").textContent = BUCKET_URL + "/" + FINDINGS_PREFIX;
 
-/* ─── STATE ─── */
 let timelineChart = null, correctnessChart = null, categoryChart = null;
 let chartsInitialized = false;
 
-/*
- * timelineSorted is a mutable module-level ref so the tooltip callback always
- * reads current data — not the array captured at chart-init time.
- */
 let timelineSorted = [];
+let catSorted      = [];
 
-/* ─── HELPERS ─── */
 function isDark()    { return window.matchMedia("(prefers-color-scheme: dark)").matches; }
 function axisColor() { return isDark() ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"; }
 function gridColor() { return isDark() ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"; }
@@ -334,7 +326,6 @@ function findingColorHex(f) {
   }
 }
 
-/* Tick label for the x-axis: full date + time so the assessment day is unambiguous */
 function fmtAxisTick(ms) {
   const d  = new Date(ms);
   const mo = String(d.getUTCMonth() + 1).padStart(2, "0");
@@ -344,7 +335,6 @@ function fmtAxisTick(ms) {
   return `${mo}-${dy} ${hr}:${mn}`;
 }
 
-/* ─── S3 FETCH ─── */
 async function listFindings() {
   const url = `${BUCKET_URL}?list-type=2&prefix=${FINDINGS_PREFIX}&max-keys=1000`;
   const res = await fetch(url);
@@ -361,26 +351,24 @@ async function fetchFinding(key) {
   return res.json();
 }
 
-/* ─── METRICS ─── */
 function renderMetrics(findings) {
   const total        = findings.length;
   const correctFlags = findings.filter(f => f.correct_elements.flag).length;
   const fullyCorrect = findings.filter(f => findingScore(f) === "correct").length;
   const withFlag     = findings.filter(f => f.correct_elements.flag);
-  const uniqueFlags  = new Set(withFlag.map(f => f.flag_reported)).size;
   const catOk        = withFlag.filter(f => f.correct_elements.category).length;
   const hostOk       = withFlag.filter(f => f.correct_elements.host).length;
+  const portOk       = withFlag.filter(f => f.correct_elements.port).length;
 
   document.getElementById("m-total").textContent     = total;
   document.getElementById("m-flags").textContent     = correctFlags;
   document.getElementById("m-flags-pct").textContent = pct(correctFlags, total) + " of submissions";
   document.getElementById("m-full").textContent      = fullyCorrect;
-  document.getElementById("m-unique").textContent    = uniqueFlags;
   document.getElementById("m-cat").textContent       = pct(catOk, withFlag.length);
   document.getElementById("m-host").textContent      = pct(hostOk, withFlag.length);
+  document.getElementById("m-port").textContent      = pct(portOk, withFlag.length);
 }
 
-/* ─── TABLE ─── */
 function renderTable(findings) {
   const tbody = document.getElementById("findings-body");
   tbody.innerHTML = "";
@@ -413,10 +401,10 @@ function renderTable(findings) {
 
     [
       ["col-time", formatTime(f.time)],
-      ["col-flag", f.flag_reported     || "—"],
-      ["col-cat",  f.category_reported || "—"],
-      ["col-host", f.host              || "—"],
-      ["col-port", f.port != null ? f.port : "—"],
+      ["col-flag", f.flag_reported     || "----"],
+      ["col-cat",  f.category_reported || "----"],
+      ["col-host", f.host              || "----"],
+      ["col-port", f.port != null ? f.port : "----"],
     ].forEach(([cls, text]) => {
       const td = document.createElement("td");
       td.className = cls;
@@ -451,147 +439,221 @@ function renderTable(findings) {
   });
 }
 
-/* ─── CHART DATA BUILDERS ─── */
-
 /*
- * Timeline: stacked cumulative lines (wrong / partial / correct) that sum to
- * the total, plus the per-submission scatter dots drawn on top.
- *
- * Dataset layout (order matters for fill: '-1'):
- *   0  wrongLine   – cumulative wrong count       fill 'origin'  red
- *   1  partialLine – cumulative wrong+partial      fill '-1'      amber
- *   2  correctLine – cumulative wrong+partial+correct = total  fill '-1'  green
- *   3  scatterDots – individual submissions, colored, on top
+ * Timeline datasets:
+ *   0 | greyLine    | connector line only (pointRadius 0), drawn first = behind dots
+ *   1 | scatterDots | colored per-submission dots (showLine false), drawn on top of grey line
+ *   2 | correctLine | independent cumulative correct count, green fill
+ *   3 | partialLine | independent cumulative partial count, amber fill
+ *   4 | wrongLine   | independent cumulative wrong count, red fill
  */
 function getTimelineData(findings) {
   const sorted = [...findings].sort((a, b) => new Date(a.time) - new Date(b.time));
-  let cumW = 0, cumP = 0, cumC = 0;
-  const wrongLine = [], partialLine = [], correctLine = [];
+  let cumC = 0, cumP = 0, cumW = 0;
+  const correctLine = [], partialLine = [], wrongLine = [];
 
   sorted.forEach(f => {
     const s = findingScore(f);
-    if      (s === "wrong")   cumW++;
+    if      (s === "correct") cumC++;
     else if (s === "partial") cumP++;
-    else                      cumC++;
+    else                      cumW++;
     const x = new Date(f.time).getTime();
-    wrongLine.push({   x, y: cumW });
-    partialLine.push({ x, y: cumW + cumP });
-    correctLine.push({ x, y: cumW + cumP + cumC });
+    correctLine.push({ x, y: cumC });
+    partialLine.push({ x, y: cumP });
+    wrongLine.push(  { x, y: cumW });
   });
 
   return {
     sorted,
     points:      sorted.map((f, i) => ({ x: new Date(f.time).getTime(), y: i + 1 })),
     colors:      sorted.map(findingColorHex),
-    wrongLine, partialLine, correctLine
+    correctLine, partialLine, wrongLine
   };
 }
 
-/*
- * Correctness breakdown per field.
- * Green  = field correct.
- * Amber  = field wrong BUT flag was correct (agent found it, got this detail wrong).
- *          For the Flag field itself this is always 0.
- * Red    = flag wrong (agent missed the finding entirely).
- */
 function getCorrectnessData(findings) {
-  const fields      = ["flag", "category", "host", "port"];
-  const wrongFlagN  = findings.filter(x => !x.correct_elements.flag).length;
+  const withFlag    = findings.filter(x => x.correct_elements.flag);
+  const wrongFlagN  = findings.length - withFlag.length;
 
-  const correct      = fields.map(f => findings.filter(x => x.correct_elements[f] === true).length);
-  const partialWrong = fields.map(f =>
-    f === "flag" ? 0
-    : findings.filter(x => x.correct_elements.flag === true && x.correct_elements[f] === false).length
-  );
-  const flagWrong    = fields.map(() => wrongFlagN);
+  const correct = [
+    findings.filter(x =>  x.correct_elements.flag).length,
+    withFlag.filter(x =>  x.correct_elements.category).length,
+    withFlag.filter(x =>  x.correct_elements.host).length,
+    withFlag.filter(x =>  x.correct_elements.port).length,
+  ];
+  const wrong = [
+    wrongFlagN,
+    withFlag.filter(x => !x.correct_elements.category).length,
+    withFlag.filter(x => !x.correct_elements.host).length,
+    withFlag.filter(x => !x.correct_elements.port).length,
+  ];
 
-  return { correct, partialWrong, flagWrong };
+  return { correct, wrong };
 }
 
-/*
- * Category chart: each reported-category bucket split into
- * fully correct / partial / wrong-flag submissions.
- */
-function getCategoryData(findings) {
-  const cats = {};
-  for (const f of findings) {
-    const cat = f.category_reported || "unknown";
-    if (!cats[cat]) cats[cat] = { correct: 0, partial: 0, wrong: 0 };
-    const s = findingScore(f);
-    if      (s === "correct") cats[cat].correct++;
-    else if (s === "partial") cats[cat].partial++;
-    else                      cats[cat].wrong++;
+const CAT_PALETTE = [
+  "#378add", // blue
+  "#d85a30", // coral
+  "#7f77dd", // purple
+  "#1d9e75", // teal
+  "#ba7517", // amber
+  "#d4537e", // pink
+  "#639922", // green
+  "#888780", // gray
+];
+const catColorMap = {};
+let catColorIdx = 0;
+
+function catColor(cat) {
+  if (!catColorMap[cat]) {
+    catColorMap[cat] = CAT_PALETTE[catColorIdx % CAT_PALETTE.length];
+    catColorIdx++;
   }
-  const labels = Object.keys(cats).sort();
-  return {
-    labels,
-    correct: labels.map(l => cats[l].correct),
-    partial: labels.map(l => cats[l].partial),
-    wrong:   labels.map(l => cats[l].wrong)
-  };
+  return catColorMap[cat];
 }
 
-/* ─── CHART INIT — first page load, default animation plays ─── */
-function initTimelineChart(findings) {
-  const { sorted, points, colors, wrongLine, partialLine, correctLine } = getTimelineData(findings);
-  timelineSorted = sorted;
+function getCategoryScatterData(findings) {
+  const sorted = [...findings].sort((a, b) => new Date(a.time) - new Date(b.time));
+  const points = sorted.map((f, i) => ({ x: new Date(f.time).getTime(), y: i + 1 }));
+  const colors = sorted.map(f => catColor(f.category_reported || "unknown"));
 
-  const dk  = isDark();
-  const ttBg     = dk ? "#3a3936" : "#ffffff";
-  const ttBorder = dk ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.14)";
-  const ttTitle  = dk ? "#f0ece4" : "#1a1a18";
-  const ttBody   = dk ? "#b4b2a9" : "#5f5e5a";
-  const connLine = dk ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)";
+  const seen = [], seenSet = new Set();
+  sorted.forEach(f => {
+    const cat = f.category_reported || "unknown";
+    if (!seenSet.has(cat)) { seen.push(cat); seenSet.add(cat); }
+  });
+  return { sorted, points, colors, legend: seen };
+}
+
+function initTimelineChart(findings) {
+  const { sorted, correctLine, partialLine, wrongLine } = getTimelineData(findings);
+  timelineSorted = sorted;
 
   const ctx = document.getElementById("chart-timeline").getContext("2d");
   timelineChart = new Chart(ctx, {
     type: "scatter",
     data: {
       datasets: [
-        /* 0 – wrong (bottom fill) */
+        {
+          data:            correctLine,
+          showLine:        true,
+          fill:            "origin",
+          borderColor:     "rgba(59,109,17,0.75)",
+          backgroundColor: "rgba(59,109,17,0.12)",
+          pointRadius:     0,
+          borderWidth:     1.5,
+          tension:         0.3
+        },
+        {
+          data:            partialLine,
+          showLine:        true,
+          fill:            "origin",
+          borderColor:     "rgba(133,79,11,0.75)",
+          backgroundColor: "rgba(133,79,11,0.12)",
+          pointRadius:     0,
+          borderWidth:     1.5,
+          tension:         0.3
+        },
         {
           data:            wrongLine,
           showLine:        true,
           fill:            "origin",
-          borderColor:     "rgba(163,45,45,0.7)",
-          backgroundColor: "rgba(163,45,45,0.1)",
+          borderColor:     "rgba(163,45,45,0.75)",
+          backgroundColor: "rgba(163,45,45,0.12)",
           pointRadius:     0,
           borderWidth:     1.5,
           tension:         0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: {
+          type: "linear",
+          ticks: {
+            callback:      (val) => fmtAxisTick(val),
+            maxTicksLimit: 8,
+            maxRotation:   35,
+            color:         axisColor(),
+            font:          { size: 11 }
+          },
+          grid: { color: gridColor() }
         },
-        /* 1 – partial (fills up from wrong) */
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: "findings", color: axisColor(), font: { size: 10 } },
+          ticks: { stepSize: 1, color: axisColor(), font: { size: 11 } },
+          grid:  { color: gridColor() }
+        }
+      }
+    }
+  });
+}
+
+function initCorrectnessChart(findings) {
+  const { correct, wrong } = getCorrectnessData(findings);
+  const ctx = document.getElementById("chart-correctness").getContext("2d");
+  correctnessChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Flag", "Category", "Host", "Port"],
+      datasets: [
+        { label: "Correct",   data: correct, backgroundColor: "rgba(59,109,17,0.85)", borderWidth: 0 },
+        { label: "Incorrect", data: wrong,   backgroundColor: "rgba(163,45,45,0.75)", borderWidth: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, ticks: { color: axisColor(), font: { size: 12 } }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } }, grid: { color: gridColor() } }
+      }
+    }
+  });
+}
+
+function initCategoryChart(findings) {
+  const { sorted, points, colors, legend } = getCategoryScatterData(findings);
+  catSorted = sorted;
+
+  const dk       = isDark();
+  const greyLine = dk ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)";
+  const ttBg     = dk ? "#3a3936" : "#ffffff";
+  const ttBorder = dk ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.14)";
+  const ttTitle  = dk ? "#f0ece4" : "#1a1a18";
+  const ttBody   = dk ? "#b4b2a9" : "#5f5e5a";
+
+  const legendEl = document.getElementById("legend-category");
+
+  const dotColors = sorted.map(findingColorHex);
+
+  const ctx = document.getElementById("chart-categories").getContext("2d");
+  categoryChart = new Chart(ctx, {
+    type: "scatter",
+    data: {
+      datasets: [
         {
-          data:            partialLine,
-          showLine:        true,
-          fill:            "-1",
-          borderColor:     "rgba(133,79,11,0.7)",
-          backgroundColor: "rgba(133,79,11,0.1)",
-          pointRadius:     0,
-          borderWidth:     1.5,
-          tension:         0.3
+          data:        points,
+          showLine:    true,
+          fill:        false,
+          borderColor: greyLine,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension:     0.2,
+          order:       1
         },
-        /* 2 – correct (fills up from partial) */
         {
-          data:            correctLine,
-          showLine:        true,
-          fill:            "-1",
-          borderColor:     "rgba(59,109,17,0.7)",
-          backgroundColor: "rgba(59,109,17,0.1)",
-          pointRadius:     0,
-          borderWidth:     1.5,
-          tension:         0.3
-        },
-        /* 3 – per-submission scatter dots drawn last = on top */
-        {
-          data:               points,
-          pointBackgroundColor: colors,
-          pointBorderColor:     colors,
+          data:                 points,
+          showLine:             false,
+          pointBackgroundColor: dotColors,
+          pointBorderColor:     dotColors,
           pointRadius:          7,
           pointHoverRadius:     9,
-          showLine:             true,
-          borderColor:          connLine,
-          borderWidth:          1,
-          tension:              0.2
+          order:                0
         }
       ]
     },
@@ -609,12 +671,12 @@ function initTimelineChart(findings) {
           bodyColor:       ttBody,
           bodyFont:        { family: "monospace", size: 12 },
           padding:         10,
-          filter: (item) => item.datasetIndex === 3, /* only the scatter dots get tooltips */
+          filter: (item) => item.datasetIndex === 1,
           callbacks: {
             title: (items) =>
               new Date(items[0].parsed.x).toISOString().replace("T", " ").slice(0, 16) + " UTC",
             label: (item) => {
-              const f = timelineSorted[item.dataIndex];
+              const f = catSorted[item.dataIndex];
               if (!f) return "";
               const c = f.correct_elements;
               return [
@@ -641,7 +703,7 @@ function initTimelineChart(findings) {
         },
         y: {
           beginAtZero: true,
-          title: { display: true, text: "cumulative", color: axisColor(), font: { size: 10 } },
+          title: { display: true, text: "findings", color: axisColor(), font: { size: 10 } },
           ticks: { stepSize: 1, color: axisColor(), font: { size: 11 } },
           grid:  { color: gridColor() }
         }
@@ -650,97 +712,43 @@ function initTimelineChart(findings) {
   });
 }
 
-function initCorrectnessChart(findings) {
-  const { correct, partialWrong, flagWrong } = getCorrectnessData(findings);
-  const ctx = document.getElementById("chart-correctness").getContext("2d");
-  correctnessChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Flag", "Category", "Host", "Port"],
-      datasets: [
-        { label: "Correct",          data: correct,      backgroundColor: "rgba(59,109,17,0.85)",  borderWidth: 0 },
-        { label: "Wrong detail",     data: partialWrong, backgroundColor: "rgba(133,79,11,0.85)", borderWidth: 0 },
-        { label: "Wrong flag",       data: flagWrong,    backgroundColor: "rgba(163,45,45,0.75)",  borderWidth: 0 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { stacked: true, ticks: { color: axisColor(), font: { size: 12 } }, grid: { display: false } },
-        y: { stacked: true, beginAtZero: true, ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } }, grid: { color: gridColor() } }
-      }
-    }
-  });
-}
-
-function initCategoryChart(findings) {
-  const { labels, correct, partial, wrong } = getCategoryData(findings);
-  const ctx = document.getElementById("chart-categories").getContext("2d");
-  categoryChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        { label: "Correct",  data: correct,  backgroundColor: "rgba(59,109,17,0.85)", borderWidth: 0 },
-        { label: "Partial",  data: partial,  backgroundColor: "rgba(133,79,11,0.85)", borderWidth: 0 },
-        { label: "Wrong",    data: wrong,    backgroundColor: "rgba(163,45,45,0.75)", borderWidth: 0 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { stacked: true, ticks: { color: axisColor(), font: { size: 11 }, autoSkip: false, maxRotation: 35 }, grid: { display: false } },
-        y: { stacked: true, beginAtZero: true, ticks: { color: axisColor(), stepSize: 1, font: { size: 11 } }, grid: { color: gridColor() } }
-      }
-    }
-  });
-}
-
-/* ─── CHART UPDATE — subsequent refreshes ───────────────────────────────────
- * Uses a short 350 ms ease instead of the instant "none" or the full 1 s
- * initial animation.  Just enough motion to signal the data changed.
- */
 const REFRESH_ANIM = { duration: 350, easing: "easeInOutSine" };
 
 function updateTimelineChart(findings) {
-  const { sorted, points, colors, wrongLine, partialLine, correctLine } = getTimelineData(findings);
+  const { sorted, correctLine, partialLine, wrongLine } = getTimelineData(findings);
   timelineSorted = sorted;
   const ds = timelineChart.data.datasets;
-  ds[0].data               = wrongLine;
-  ds[1].data               = partialLine;
-  ds[2].data               = correctLine;
-  ds[3].data               = points;
-  ds[3].pointBackgroundColor = colors;
-  ds[3].pointBorderColor     = colors;
-  ds[3].borderColor = isDark() ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)";
+  ds[0].data = correctLine;
+  ds[1].data = partialLine;
+  ds[2].data = wrongLine;
   timelineChart.options.animation = REFRESH_ANIM;
   timelineChart.update();
 }
 
 function updateCorrectnessChart(findings) {
-  const { correct, partialWrong, flagWrong } = getCorrectnessData(findings);
+  const { correct, wrong } = getCorrectnessData(findings);
   const ds = correctnessChart.data.datasets;
   ds[0].data = correct;
-  ds[1].data = partialWrong;
-  ds[2].data = flagWrong;
+  ds[1].data = wrong;
   correctnessChart.options.animation = REFRESH_ANIM;
   correctnessChart.update();
 }
 
 function updateCategoryChart(findings) {
-  const { labels, correct, partial, wrong } = getCategoryData(findings);
-  categoryChart.data.labels      = labels;
-  const ds = categoryChart.data.datasets;
-  ds[0].data = correct;
-  ds[1].data = partial;
-  ds[2].data = wrong;
+  const { sorted, points, colors, legend } = getCategoryScatterData(findings);
+  catSorted = sorted;
+  const dotColors = sorted.map(findingColorHex);
+  const ds        = categoryChart.data.datasets;
+  const greyLine  = isDark() ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)";
+  ds[0].data        = points;
+  ds[0].borderColor = greyLine;
+  ds[1].data                 = points;
+  ds[1].pointBackgroundColor = dotColors;
+  ds[1].pointBorderColor     = dotColors;
   categoryChart.options.animation = REFRESH_ANIM;
   categoryChart.update();
 }
 
-/* ─── MAIN LOAD LOOP ─── */
 async function loadAll() {
   const dot = document.getElementById("status-dot");
   dot.className = "status-dot loading";

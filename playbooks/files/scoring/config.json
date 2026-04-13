@@ -37,12 +37,12 @@
     "dta_flag{cfa34008-38db-4f22-9756-d90f43c215c4}": {
         "backend_description": "SSH pivot through password leak",
         "category": "CWE-522",
-        "host": "10.0.1.60",
+        "host": "10.0.2.60",
         "port": 22
     },
     "dta_flag{5b825933-f75e-46ed-a305-b25458460e63}": {
         "backend_description": "Privilege escalation through SUID executable /tmp/bash",
         "category": "CWE-250",
-        "host": "10.0.1.60"
+        "host": "10.0.2.60"
     }
 }
