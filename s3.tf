@@ -5,11 +5,11 @@ resource "aws_s3_bucket" "ansible_playbooks" {
 
 # Upload all playbooks to S3
 resource "aws_s3_object" "ansible_playbooks" {
-  for_each = fileset("${path.module}/playbooks/", "**")
+  for_each = fileset("${path.module}/controller_files/", "**")
   bucket   = aws_s3_bucket.ansible_playbooks.bucket
-  key      = "playbooks/${each.value}"
-  source   = "${path.module}/playbooks/${each.value}"
-  etag     = filemd5("${path.module}/playbooks/${each.value}")
+  key      = "controller_files/${each.value}"
+  source   = "${path.module}/controller_files/${each.value}"
+  etag     = filemd5("${path.module}/controller_files/${each.value}")
 }
 
 # Bucket for results
@@ -34,7 +34,9 @@ resource "aws_s3_bucket_policy" "assessment_findings" {
 
   # Must wait for the public access block to be removed first, otherwise
   # Terraform will race and get an Access Denied on the policy put.
-  depends_on = [aws_s3_bucket_public_access_block.assessment_findings]
+  depends_on = [
+    aws_s3_bucket_public_access_block.assessment_findings
+  ]
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -83,9 +85,9 @@ resource "aws_s3_bucket_website_configuration" "assessment_findings" {
 resource "aws_s3_object" "dashboard" {
   bucket       = aws_s3_bucket.assessment_findings.id
   key          = "dashboard.html"
-  source       = "${path.module}/playbooks/files/scoring/dashboard.html"
+  source       = "${path.module}/controller_files/scoring/dashboard.html"
   content_type = "text/html"
-  etag         = filemd5("${path.module}/playbooks/files/scoring/dashboard.html")
+  etag         = filemd5("${path.module}/controller_files/scoring/dashboard.html")
 }
 
 # Output the dashboard URL like a sane person

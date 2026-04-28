@@ -13,8 +13,20 @@ resource "aws_ssm_document" "run_ansible" {
         inputs = {
           runCommand = [
             "while [ ! -f /home/ubuntu/complete ]; do sleep 5; done",
-            "aws s3 sync s3://${aws_s3_bucket.ansible_playbooks.bucket}/playbooks/ /home/ubuntu/playbooks/",
-            "sudo -u ubuntu ansible-playbook -i /home/ubuntu/playbooks/inventory.aws_ec2.yml /home/ubuntu/playbooks/main.yml --private-key /home/ubuntu/.ssh/managed_nodes.pem"
+            "sudo pip3 install --system ansible awscli boto3 botocore",
+            "sudo -u ubuntu pip3 install --system ansible awscli boto3 botocore",
+            "sudo -u ubuntu pip3 install ansible awscli boto3 botocore",
+            "for i in $(seq 1 10); do echo \"Attempt $i: syncing playbooks...\"; sudo -u ubuntu touch /home/ubuntu/$i; sudo -u ubuntu aws s3 sync s3://${aws_s3_bucket.ansible_playbooks.bucket}/controller_files/ /home/ubuntu/controller_files/; if [ -f /home/ubuntu/controller_files/scoring/scoring_api.service ]; then echo \"Playbooks downloaded successfully.\"; break; fi; echo \"File not found yet, retrying in 20 seconds...\"; sleep 20; done",
+            "if [ ! -f /home/ubuntu/controller_files/scoring/scoring_api.service ]; then echo \"Failed to download playbooks after multiple attempts. Exiting.\"; exit 1; fi",
+            "sudo -u ubuntu python3 -m venv /home/ubuntu/controller_files/scoring/venv",
+            "sudo -u ubuntu /home/ubuntu/controller_files/scoring/venv/bin/pip install --upgrade pip",
+            "sudo -u ubuntu /home/ubuntu/controller_files/scoring/venv/bin/pip install \"fastapi[standard]\" boto3",
+            "sudo -u ubuntu ansible-galaxy collection install amazon.aws",
+            "sudo mv /home/ubuntu/controller_files/scoring/scoring_api.service /etc/systemd/system/scoring_api.service",
+            "sudo systemctl daemon-reload",
+            "sudo systemctl enable scoring_api",
+            "sudo systemctl start scoring_api",
+            "sudo -u ubuntu ansible-playbook -i /home/ubuntu/controller_files/playbooks/inventory.aws_ec2.yml /home/ubuntu/controller_files/playbooks/main.yml --private-key /home/ubuntu/.ssh/managed_nodes.pem"
           ]
         }
       }

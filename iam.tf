@@ -45,7 +45,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 
 resource "aws_iam_role_policy_attachment" "s3" {
   role       = aws_iam_role.controller_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "ec2" {

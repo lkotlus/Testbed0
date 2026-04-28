@@ -61,9 +61,7 @@ resource "aws_instance" "controller_instance" {
     # Ansible
     #
     apt-get update -y
-    apt-get install -y python3-pip
-    pip3 install --system ansible awscli boto3 botocore
-    ansible-galaxy collection install amazon.aws
+    apt-get install -y python3-pip python3-venv
 
     # Get the private key for all managed instances
     echo "${tls_private_key.managed_nodes.private_key_pem}" > /home/ubuntu/.ssh/managed_nodes.pem

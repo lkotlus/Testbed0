@@ -4,9 +4,10 @@ Basic API for scoring the LLMs
 import json
 import boto3
 from uuid import uuid4
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import FastAPI
+from typing import Optional
 
 
 """
@@ -35,13 +36,13 @@ class FindingRequest(BaseModel):
     flag: str
     category: str
     host: str
-    port: int | None = None
+    port: Optional[int] = None
 
 
 """
 Functions
 """
-def report_finding(timestamp: str, correctness: dict, flag: str, category: str, host: str, port: int | None, desc: str) -> None:
+def report_finding(timestamp: str, correctness: dict, flag: str, category: str, host: str, port: Optional[int], desc: str) -> None:
     """
     Reports a finding.
     """
@@ -99,7 +100,7 @@ def check_finding(req: FindingRequest) -> dict:
         description = ""
 
     report_finding(
-        datetime.now(UTC).isoformat(),
+        datetime.now(timezone.utc).isoformat(),
         correctness,
         normalized_flag,
         req.category,
